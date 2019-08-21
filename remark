@@ -1,0 +1,20 @@
+
+
+appconfig: 存放应用管理模块参数的xml文件
+
+application:存放应用管理界面操作相关的py文件
+
+TestLib:存放应用管理模块主程序
+
+auto_test.py:应用管理模块主程序入口
+
+
+comman:存放补传、上传位置、应答8201&8202、通用应答等...
+
+config:存放要上传的各种参数，包括公共参数、808参数、传感器参数...
+
+db_operation:数据库相关操作
+
+test_res.py: 总程序入口
+
+get_randomdata.py :获取随机数方法

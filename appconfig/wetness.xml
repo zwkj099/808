@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<!-- 输入选择id -->
+			<autouploadtime>1</autouploadtime>
+			<output_k>101</output_k>
+			<output_b>101</output_b>	
+			<overValve>30</overValve>
+			<!-- alarmUP 必须大于 alarmDown -->
+			<alarmUp>11</alarmUp>	
+			<alarmDown>1</alarmDown>	
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+
