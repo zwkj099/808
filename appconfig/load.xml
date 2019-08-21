@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<NO>1</NO>
+			<noLoadValue>1001</noLoadValue>
+			<noLoadThreshold>10</noLoadThreshold>
+			<lightLoadValue>1051</lightLoadValue>
+			<lightLoadThreshold>10</lightLoadThreshold>
+			<fullLoadValue>1201</fullLoadValue>
+			<fullLoadThreshold>10</fullLoadThreshold>
+			<overLoadValue>1301</overLoadValue>
+			<overLoadThreshold>10</overLoadThreshold>			
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+
