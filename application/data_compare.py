@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import application
-import win32api
-import win32con
+# import win32api
+# import win32con
 import re
 import sys
 reload(sys)
@@ -359,7 +359,7 @@ class data_compare(object):
                     print str(calibration[k]) + " with "+str(rec_calibration[k])+" not match"
                     logtofile(logfile,"error:    "+str(calibration[k])+"       "+str(rec_calibration[k])+"\n")
                     errorinfo = str(calibration[k]) + " with "+str(rec_calibration[k])+" not match"
-                    win32api.MessageBox(0, errorinfo, errorinfo,win32con.MB_ICONWARNING)
+                    #win32api.MessageBox(0, errorinfo, errorinfo,win32con.MB_ICONWARNING)
                 else:
                     
                     logtofile(logfile,"     "+str(calibration[k])+"     "+str(rec_calibration[k])+"\n")
@@ -581,7 +581,7 @@ class data_compare(object):
                     logtofile(logfile,data_title[j]+":error:     "+str(send_data[j])+"      "+str(rec_data[j])+"\n")
                     errorinfo="error:Temp"+"\n"+data_title[j]+" \nsend data: "+str(send_data[j])+" with receive data: "+str(rec_data[j])+ " not match"
                     
-                    win32api.MessageBox(0, errorinfo, "Fail",win32con.MB_ICONWARNING)
+                    #win32api.MessageBox(0, errorinfo, "Fail",win32con.MB_ICONWARNING)
                     print "error:Temp"+"\n"+data_title[j]+" \nsend data: "+str(send_data[j])+" with receive data: "+str(rec_data[j])+ " not match"
                     kk=False
                     
@@ -999,7 +999,7 @@ class data_compare(object):
                     logtofile(logfile,data_title[j]+":error   "+str(send_data[j])+"     "+str(rec_data[j])+"\n")
                     errorinfo="error:Labor"+"\n"+data_title[j]+" \nsend data: "+str(send_data[j])+" with receive data: "+str(rec_data[j])+ " not match"
                     
-                    win32api.MessageBox(0, errorinfo, "Fail",win32con.MB_ICONWARNING)
+                    #win32api.MessageBox(0, errorinfo, "Fail",win32con.MB_ICONWARNING)
                     print "error:Labor"+"\n"+data_title[j]+" \nsend data: "+str(send_data[j])+" with receive data: "+str(rec_data[j])+ " not match"
                     kk=False
                     

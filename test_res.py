@@ -37,9 +37,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
 
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
     # 组装数据
-    zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys = readcig.build_data(pdict, sichuandict, ex808dict,
-                                                                                       sensordict, bluetoothdict,
-                                                                                       deviceid)
+    zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys = readcig.build_data(pdict, sichuandict, ex808dict,sensordict, bluetoothdict,deviceid)
 
     info = [zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys]
 
@@ -49,12 +47,9 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     2.idlist：外设及传感器附加信息
     3.wsid：主动安全报警附加信息
     """
-    extrainfo_id = [
-        1]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
-    idlist = [
-        84]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
-    wsid = [
-        0]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
+    extrainfo_id = [1]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
+    idlist = [65]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
+    wsid = [100]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
     link = tp.tcp_link(ip, port)
     # 注册、鉴权、心跳
@@ -90,7 +85,6 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
         t = int(time.strftime("%H%M%S", time.localtime()))
         while True:
             if abs(int(time.strftime("%H%M%S", time.localtime())) - t) >= pdict['period']:
-                #                 print info
                 ex808dict['mel'] += 1
                 sensordict['AD'] += 1
                 sensordict['Oil'] += 1
@@ -98,8 +92,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                 pdict['jin'] += 0.001
                 pdict['wei'] += 0.001
                 info = readcig.build_data(pdict, sichuandict, ex808dict, sensordict, bluetoothdict, deviceid)
-                upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist,
-                                         wsid)
+                upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist,wsid)
                 res = tp.receive_data(link)
                 res = tp.dd(res)
                 # 切割响应
@@ -112,8 +105,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                     reno = "01"
 
                     if id in ["8201", "8202"]:
-                        reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,
-                                                 idlist, wsid, answer_number, res, id, reno)
+                        reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
 
                     else:
                         reply.reply(link, i, mobile, id, answer_number)
@@ -130,8 +122,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                     # list=ano_res(res)
                     if id in ["8201", "8202"]:
                         try:
-                            reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,
-                                                     idlist, wsid, answer_number, res, id, reno)
+                            reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
                         except Exception as e:
                             print e
                     else:
@@ -148,20 +139,13 @@ def ano_res(res):
     re_list = re.findall(pa, str(res))
     return re_list
 
-
-# 组装响应报文body
-# def get_usyal_body(id,ac,reno="00"):
-#     body=ac+id+reno
-#     return body
-
-
 # 设置接入ip
 ip = "192.168.24.142"  # "111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6994  # 6994川标,6995冀标，6975部标
-deviceid = 3201322
-mobile = 18776763202
-vnum = u"桂A00002"
+port = 6995  # 6994川标,6995冀标，6975部标
+deviceid = 1040000
+mobile = 13100040000
+vnum = u"渝B40000"
 cont = 0
 name = "艾丽11"
 qualification = 14003529463400352903
