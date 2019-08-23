@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestAutomatiomCfg>
+	<plublicparameters>
+	
+<!-- 		alarm：#报警状态
+	    status：#状态
+	    jin：#经度
+	    wei：#纬度
+	    high：#高程
+	    speed：#速度
+	    direction:#方向
+	    period: #位置上传间隔，单位S，设定小于10时，默认10S上传
+	    ti: # 时间，0表示使用当前时间；指定时间可补传数据，格式为：190612101525
+	    detester:'2019-06-14 09:00:00' #补报数据开始时间，补报1小时数据，注：ti为 0时 无效
+	    messageid: #区分单条位置512和批量位置1796
+	    version: #协议版本标识 version=0时表示2013版808协议，version=1时表示2019版808协议 -->
+    
+		<Key>alarm=3</Key>
+		<Key>status=1</Key>
+		<Key>jin=104.505043</Key>
+		<Key>wei=28.173847</Key>
+		<Key>high=100</Key>
+		<Key>speed=80</Key>
+		<Key>direction=100</Key>
+		<Key>period=30</Key>
+		<Key>ti=0</Key>
+		<Key>detester=2019-06-14 09:00:00</Key>
+		<Key>messageid=512</Key>
+		<Key>version=0</Key>
+
+	</plublicparameters>
+	
+	
+	<!--# 川冀标主动安全参数-->
+	<sichuanparameters>
+		<!--     
+			zstatus：#087 #主动安全车辆状态
+		    attach_Count：#附件数量
+		    sign：#标志状态,取值0、1、2
+		    event：#报警、事件类型，取值1、2、3、4、5、6、7、8、16、17、18
+		    level： #报警级别，取值1、2
+		    deviate：#偏离类型，取值0、1、2
+		    road_sign：#道路标志识别类型，取值0、1、2、3
+		    fatigue：#疲劳程度,取值0、1、2、3、4、5、6、7、8、9、10
+     -->
+		<Key>zstatus=1</Key>
+		<Key>attach_Count=1</Key>
+		<Key>sign=1</Key>
+		<Key>event=1</Key>
+		<Key>level=1</Key>
+		<Key>deviate=1</Key>
+		<Key>road_sign=1</Key>
+		<Key>fatigue=1</Key>	
+	</sichuanparameters>
+	
+	<!-- 808附加信息相关参数 -->
+	<Extras808parameters>
+		<!--
+			vedio_alarm: 视频相关报警参数：1视频信号丢失报警，2视频信号遮挡报警，4存储单元故障报警，8其他视频设备故障报警，16客车超员报警，32异常驾驶行为报警，64特殊报警录像达到存储阈值报警,127以上全部视频相关报警 
+			vedio_signal:逻辑通道号，按位计算共32位，对应位为1则对应的逻辑通道号异常，赋值时需要转换为10进制赋值
+			memery:存储器序号，按位计算，共16位，对应位为1则对应的存储器异常，bit0-bit11分别是1-12个主存储器，bit12-bit15分别是1-4个灾备存储器，赋值时需要转换为10进制赋值
+			abnormal_driving:异常驾驶行为参数：1疲劳，2打电话，4抽烟
+			extra_speed:附加信息－行驶记录功能获取的速度
+			mel:附加信息－里程
+			oil:附加信息－油量
+			by:附加信息－信号强度
+			wn:附加信息－GNSS 定位卫星数 
+		-->
+		<Key>vedio_alarm=127</Key>	
+		<Key>vedio_signal=3</Key>
+		<Key>memery=2</Key>
+		<Key>abnormal_driving=4</Key>	
+		<Key>mel=1000</Key>
+		<Key>oil=1</Key>
+		<Key>extra_speed=1</Key>
+		<Key>by=1</Key>		
+		<Key>wn=1</Key>
+					
+	</Extras808parameters>
+	
+	<!--# 传感器参数-->	
+	<sensorparameters>
+		<!--油量传感器参数
+		    AD：#AD 值
+    		Oil：#液体量,总油量
+    		addoil：#加油量
+    	-->
+		<Key>AD=30</Key>
+		<Key>Oil=20</Key>
+		<Key>addoil=0</Key>
+		
+		<!--温度传感器参数
+		    sign:#重要数据标识，Bit7：0 普通数据；1:重要数据；车载终端检测为重要数据时，则马上组包上报平台。顺时针、逆时针、停转三种状态转换时，则为重要数据；Bit0-6:保留 补零
+    		temp:#温度值，0.1 开氏温度
+    		times:#状态持续时间，累计时间
+    		warn:#高低温报警
+    	-->
+		<Key>sign=1</Key>
+		<Key>temp=273.1</Key>
+		<Key>times=0</Key>
+		<Key>warn=0</Key>
+		
+		<!--湿度传感器参数
+			hum:#湿度值，单位 0.1%
+		-->
+		<Key>hum=0</Key>
+		
+		<!--油耗传感器参数
+			oilsp:#数据标识/累计流量，总油耗
+		    oiltemp:#温度
+		    tio:#瞬时流量
+    	-->
+		<Key>oilsp=0</Key>
+		<Key>oiltemp=0</Key>
+		<Key>tio=0</Key>	
+		
+		<!--正反转传感器参数
+		    zt:#旋转状态，01-停转；02-运行
+		    fx:#旋转方向，01-顺时针旋转；02-逆时针旋转
+		    xs:#旋转速度，单位：转/分钟
+		    li:#累计脉冲数量，旋转的总脉冲数量；
+		    xtimes:#旋转方向持续时间，单位：分钟
+    	-->
+		<Key>zt=0</Key>
+		<Key>fx=0</Key>
+		<Key>xs=0</Key>
+		<Key>li=0</Key>			
+		<Key>xtimes=0</Key>
+
+		<!--载重传感器参数
+			dw: 重量单位，单位：0-0.1Kg；1-1kg；2-10kg；3-100kg；4-255 保留
+		    zt: 载重状态，01-空载； 02-满载； 03-超载； 04-装载； 05-卸载；06-轻载；07-重载
+		    cs: 装载次数，卸载/装载次数
+		    zl: 载荷重量
+		    zzzl: 装载/卸载重量
+		    ad1: 载重相对值，AD 值：范围 0x00～0xFFFF；
+		    ad2: 原始 AD 值，AD 值
+		    ad3: 浮动零点，AD 值
+    	-->
+		<Key>dw=0</Key>	
+		<Key>zt=0</Key>
+		<Key>cs=0</Key>
+		<Key>zl=0</Key>			
+		<Key>zzzl=0</Key>	
+		<Key>ad1=0</Key>
+		<Key>ad2=0</Key>			
+		<Key>ad3=0</Key>
+		
+		<!--工时传感器参数
+		    fs: 工时检测方式，0x00：电压比较式；0x01：油耗阈值式；0x02：油耗波动式0x03-0xFFFF：保留
+		    zt: 工作状态，在工作检测方式为 0 时，00：表示停机状态；01：表示工作状态；在工作检测方式为 1 时，00：表示停机状态；
+		    		01：表示工作状态；02：表示待机；在工作检测方式为 2 时，00：表示停机状态；01：表示非停机状态（可能是待机或工作，需平台判断）；
+		    ztime: 当前状态持续时长,单位秒；在工作状态为 0 时有效；表示当前状态持续时长;在工作状态为 1 时有效；表示当前状态持续时长
+		    bd: 波动值（方差值）
+		    sj: 检测数据,工时检测方式为 0 时，数据为电压值，单位 0.1V；范围0-65535；工时检测方式为 1 时，数据为流量值，单位 0.01 升/时，
+		    		取值范围，0～65535；工时检测方式为 2 时，数据为流量值，单位 0.01 升/时，取值范围，0～65535；
+    	-->
+		<Key>fs=0</Key>	
+		<Key>ztime=0</Key>
+		<Key>bd=0</Key>			
+		<Key>sj=0</Key>
+		
+		<!-- 里程传感器
+		    mel=100#累积里程
+    		speed=10#车速,Km/h 
+    		-->
+		<Key>mel=100</Key>	
+		<Key>speed=10</Key>
+										
+	</sensorparameters>
+
+	<!--蓝牙信标数据-->	
+	<bluetoothparameters>
+	<!-- num=1 #数据组数,本数据包含几组蓝牙信标信息数据；范围：1-6；
+    	UUID=11111111333333333333333333333334 #蓝牙信标设备 UUID,采用 ASCII 表示
+    	signal=2#蓝牙信标信号强度,范围 1-100；100 最强，1 最弱；
+    	distance=1#终端与蓝牙信标设备的距离 单位 0.01m；范围 1-600；0xFFFF 表示没有计算距离
+    	battery=2 #蓝牙信标设备电池电量 百分比；范围 1-100；
+     -->
+		<Key>num=1</Key>
+		<Key>UUID=111111111122222222223333333333</Key>
+		<Key>signal=1</Key>
+		<Key>distance=1</Key>			
+		<Key>battery=1</Key>
+	</bluetoothparameters>
+	
+</TestAutomatiomCfg>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<!-- 输入选择id -->
+			<autouploadtime>1</autouploadtime>
+			<output_k>101</output_k>
+			<output_b>101</output_b>
+			<normalTirePressure>2.5</normalTirePressure>	
+			<pressureImbalanceThreshold>21</pressureImbalanceThreshold>	
+			<slowLeakThreshold>6</slowLeakThreshold>
+			<highTemperatureThreshold>85</highTemperatureThreshold>
+			<lowVoltageThreshold>2.1</lowVoltageThreshold>
+			<highVoltageThreshold>2.9</highVoltageThreshold>
+			<powerAlarmThreshold>25</powerAlarmThreshold>
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+

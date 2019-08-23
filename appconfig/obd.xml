@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<!-- OBD采集间隔( -->
+			<autouploadtime>1</autouploadtime>
+		
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+
