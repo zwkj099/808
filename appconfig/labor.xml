@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			
+			<lasttimethreshold>10</lasttimethreshold>
+			<!-- 油耗波动 -->
+			<Wavecalculatio_number>8</Wavecalculatio_number>
+			<smoothingFactor>16</smoothingFactor>
+			<baudRateThreshold>9</baudRateThreshold>
+			<Wavecalculatio_time>1</Wavecalculatio_time>
+			<speedThreshold>7</speedThreshold>
+			<!-- 电压比较式 -->
+			<thresholdVoltage>25.2</thresholdVoltage>
+			<!-- 油耗阈值式 -->
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+

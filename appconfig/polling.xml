@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<sensor>0</sensor>
+			<timestr>5</timestr>
+		</Parameter>
+		<Parameter>
+			<!--sensor2-->
+			<sensor>1</sensor>
+			<timestr>4</timestr>
+		</Parameter>		
+		
+	</SuportParameterList>	
+</TEST_CONFIG>
+

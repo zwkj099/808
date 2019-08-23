@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEST_CONFIG>
+	<SuportParameterList>
+		<Parameter>
+			<!--sensor1-->
+			<!-- 输入自动时间上传id,0:代表选第一项，1：代表选第二项.... -->
+			<autouploadtime>1</autouploadtime>
+			<output_k>101</output_k>
+			<output_b>101</output_b>			
+		</Parameter>
+	</SuportParameterList>	
+</TEST_CONFIG>
+
