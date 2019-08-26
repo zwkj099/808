@@ -251,7 +251,7 @@ class mytool(object):
         ZDAQ_body = ""
         sign, event, level, deviate, road_sign, fatigue,jin, wei, high, speed, zstatus, deviceid,attach_Count=zds
         for id in ids:
-            if id in (100,101,102,103,112,113):# == 100 or id == 101 or id == 102 or id == 103 or id == 112 or id == 113:
+            if id in (100,101,102,103,112,113):
                 body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count)
                 ZDAQ_body += body
             else:
@@ -320,7 +320,6 @@ class mytool(object):
         :param event:报警、事件类型
         :param level:报警级别
         :param deviate:偏离类型
-
         :param road_sign:道路标志识别类型
         :param fatigue:疲劳程度
         :param jin:经度
@@ -337,8 +336,7 @@ class mytool(object):
         # date = datetime.datetime.strptime('2019-08-08 09:00:00', "%Y-%m-%d %H:%M:%S")
         # ti = date.strftime("%y%m%d%H%M%S")
         alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(attach_Count, 2)+"00"
-        #deviceid\ti\0\1
-        data0=jctool.to_hex(speed, 2) + jctool.to_hex(high, 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(zstatus,4) + alarm #jctool.to_hex(zalarm, 32)
+        data0=jctool.to_hex(speed, 2) + jctool.to_hex(high, 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(zstatus,4) + alarm
         # 驾驶辅助功能报警信息
         if id==100:
             data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2) + jctool.to_hex(speed, 2) + "09"+jctool.to_hex(deviate, 2) + jctool.to_hex(road_sign, 2)+"00" + data0
