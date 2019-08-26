@@ -470,10 +470,21 @@ class mytool(object):
         ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
         dnlength=len(jctool.character_string(name))/2 #驾驶员姓名长度
         znlength =len(jctool.character_string(institutions))/2 #发证机构名称长度
-        dbody=jctool.to_hex(statu, 2)+str(ti)+jctool.to_hex(result, 2)+jctool.to_hex(dnlength, 2)+jctool.character_string(name)+jctool.character_string(qualification,20)+jctool.to_hex(znlength, 2)+jctool.character_string(institutions)+"20200908"
         if version==0:
+            if statu==1:
+                dbody = jctool.to_hex(statu, 2) + str(ti) + jctool.to_hex(result, 2) + jctool.to_hex(dnlength, \
+                        2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength, \
+                        2) + jctool.character_string(institutions) + "20200908"
+            elif statu == 2:
+                dbody = jctool.to_hex(statu, 2) + str(ti)
             hhead = self.data_head(mobile, 1794, dbody, 1)
         else:
+            if statu == 1:
+                dbody = jctool.to_hex(statu, 2) + str(ti) + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,\
+                    2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,\
+                    2) + jctool.character_string(institutions) + "20200908" + jctool.character_string(qualification, 20)
+            elif statu==2:
+                dbody = jctool.to_hex(statu, 2) + str(ti)
             hhead = self.data_head_2019(mobile, 1794, dbody, 1,version)
 
         data = self.add_all(hhead+dbody)
