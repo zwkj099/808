@@ -167,7 +167,7 @@ class mytool(object):
         if int(ti) == 0:
             ti = time.strftime("%y%m%d%H%M%S", time.localtime())
 
-        if messageid==512:
+        if messageid in (512,2050):
             body = jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin,8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body #+ meliage + f3body
             return body
         if  messageid == 513:
@@ -437,7 +437,10 @@ class mytool(object):
         :return:返回组装后的位置信息
         """
         attach=str(extra_info)+zd_body+F3data
-        gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
+        if messageid == 2050:
+            gpsbody = answer_number + "0001" + "00000001" + "000100" + self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,-1, answer_number)
+        else:
+            gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
         if version==0:
             gpshead = self.data_head(mobile, messageid, gpsbody, 3)
         else:
