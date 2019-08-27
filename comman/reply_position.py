@@ -22,9 +22,9 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
         info[1][4]= ex808dict['mel']
         info[0][8]= pdict['high']
         info[2] = oils
-
+        pdict['messageid']=513
         upload_location.location(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number)
-
+        pdict['messageid']=512
     # 平台下发指令8202,跟踪
     elif id == "8202":
         nu = tp.to_int(res[26:30])  # 获取回传间隔时间
@@ -41,9 +41,13 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
         #reply.reply(link, res, mobile, id, answer_number, reno)
         i = 0
         while i < tim / nu:
-            # 组装0202位置数据，包含油量数据、里程数据
+            # 组装0200位置数据，包含油量数据、里程数据
             tp.send_data(link, usual_redata)
             upload_location.location(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number)
             time.sleep(nu)
             i += 1
-            print "第%d次发送跟踪信息：" % i    
+            print "第%d次发送跟踪信息：" % i
+    elif id == "8802":
+        pdict['messageid'] = 2050
+        upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
+        pdict['messageid'] = 512
