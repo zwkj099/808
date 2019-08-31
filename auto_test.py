@@ -12,8 +12,8 @@ tp=testlibrary.testlibrary()
 import application
 from selenium import webdriver
 app = application.application()
-# import win32api
-# import win32con
+import win32api
+import win32con
 import TAException
 import os
 
@@ -99,14 +99,14 @@ def __logtofile(__logfile,buf):
 
 def auto_test(tp,link,mobile,vnum):
 
-    browser = webdriver.Firefox()
+    browser = webdriver.Chrome()
     url='http://192.168.24.142:8080/clbs/login'
     #登录网页
     __logname =time.strftime("%Y/%m/%d %X", time.localtime()).replace("/","_").replace(":","_")+".log"#'2019_07_17 17_44_25'
     __logfile = None
     __logfile=__createlogfile(__logname,__logfile)
 
-    username='ydy1'
+    username='Lily'
     password='123456'
     app.login(url,browser,username,password)
     __logtofile(__logfile, "login success!\nusername:"+username+"\nurl:"+url+"\n")
