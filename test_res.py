@@ -64,7 +64,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
 
     # 数据库操作
     #     dbop.interface_db(tp,testlibrary)
-    auto = 0;  # 是否要跑自动化脚本？
+    auto = 1;  # 是否要跑自动化脚本？
 
     if (pdict['ti'] != 0):  # 补传数据
         buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
@@ -151,12 +151,12 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.143"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6975  # 6994川标,6995冀标，6975部标
-deviceid =3040000
-mobile = 13300040000
-vnum = u"渝B60000"
+port = 6995  # 6994川标,6995冀标，6975部标
+deviceid =1040000
+mobile = 13100040000
+vnum = u"渝B40000"
 cont = 0
 name = "艾丽11"
 qualification = 14003529463400352903
