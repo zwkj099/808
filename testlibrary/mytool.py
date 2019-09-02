@@ -44,71 +44,40 @@ class mytool(object):
                 mobile = "0" + mobile
             head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
         return head
-
-    def data_head_2019(self, mobile, newid, data, xulie=1,version=1):
-        '''
-        组装消息头
-        :param mobile: 手机号
-        :param newid:消息id，如0100,0200
-        :param data:消息体，包括基本信息，附加信息，f3信息
-        :param xulie:消息流水号，默认0001
-        :param version:协议版本，默认01
-        :return:对应消息id的消息头信息
-        '''
-        lenth = len(data)/2
-        while len(mobile) < 20:
-            mobile = "0" + mobile
-        head = jctool.to_hex(newid,4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version, 2) + str(mobile) + jctool.to_hex(xulie, 4)
-        return head
-
-
     # 组装报文body，传入ascii码的设备号和车牌号
-    def data_zc_body(self, deviceid, vnum):
+    def data_zc_body(self, deviceid, vnum,version):
         '''
         组装注册报文body
         :param deviceid: 设备号，7位数字字母
         :param vnum: 标准7位车牌号
         :return: 注册报文body
         '''
-        body = jctool.to_hex(13, 4) + jctool.to_hex(1100, 4) + jctool.to_hex(0, 10) + jctool.to_hex(0,40) + jctool.get_id(deviceid) + jctool.to_hex(2, 2) + jctool.get_vnum(vnum)
+        if version==0:
+            body = jctool.to_hex(13, 4) + jctool.to_hex(1100, 4) + jctool.to_hex(0, 10) + jctool.to_hex(0,40) + jctool.get_id(deviceid) + jctool.to_hex(2, 2) + jctool.get_vnum(vnum)
+        else:
+            while len(deviceid) < 30:
+                deviceid = "0" + deviceid
+            body = jctool.to_hex(13, 4) + jctool.to_hex(1100, 4) + jctool.to_hex(0, 22) + jctool.to_hex(0,60) + jctool.get_id(deviceid) + jctool.to_hex(2, 2) + jctool.get_vnum(vnum)
         return body
     # 组装报文body，传入ascii码的设备号和车牌号
-
-    def data_zc_body_2019(self, deviceid, vnum):
-        '''
-        组装注册报文body
-        :param deviceid: 设备号，7位数字字母
-        :param vnum: 标准7位车牌号
-        :return: 注册报文body
-        '''
-        while len(deviceid) < 30:
-            deviceid = "0" + deviceid
-        body = jctool.to_hex(13, 4) + jctool.to_hex(1100, 4) + jctool.to_hex(0, 22) + jctool.to_hex(0,60) + jctool.get_id(deviceid) + jctool.to_hex(2, 2) + jctool.get_vnum(vnum)
-        return body
-
 
     # 获取鉴权码
-    def data_jq_body(self, zcres):
+    def data_jq_body(self, zcres,version):
         '''
         从注册响应获取鉴权码，即鉴权报文body
         :param zcres: 注册时的响应,响应报文需处理为末端不带空格
         :return: 鉴权报文body，即鉴权码
         '''
-        a = str(zcres)
-        a = jctool.dd(a)
-        a = a[32:-4]
-        return a
-
-    def data_jq_body_2019(self, zcres):
-        '''
-        从注册响应获取鉴权码，即鉴权报文body
-        :param zcres: 注册时的响应,响应报文需处理为末端不带空格
-        :return: 鉴权报文body，即鉴权码
-        '''
-        a = str(zcres)
-        a = jctool.dd(a)
-        a = a[40:-4]
-        body = jctool.to_hex(len(a)/2,2) + a + jctool.to_hex(0,30) + jctool.to_hex(0,40)
+        if version==1:
+            a = str(zcres)
+            a = jctool.dd(a)
+            a = a[40:-4]
+            body = jctool.to_hex(len(a) / 2, 2) + a + jctool.to_hex(0, 30) + jctool.to_hex(0, 40)
+        else:
+            a = str(zcres)
+            a = jctool.dd(a)
+            a = a[32:-4]
+            body=a
         return body
 
     def data_gps_body(self, alarm, status, jin, wei, high, speed, ti, direction=random.randint(0, 359)):
@@ -411,25 +380,15 @@ class mytool(object):
 
     def register(self,deviceid, vnum, mobile,version=0):
         """组装注册信息"""
-        if version==0:
-            zcbody = self.data_zc_body(deviceid, vnum)
-            zchead = self.data_head(mobile, 256, zcbody, 1)
-        else:
-            zcbody = self.data_zc_body_2019(deviceid, vnum)
-            zchead = self.data_head_2019(mobile, 256, zcbody, 1,version)
+        zcbody = self.data_zc_body(deviceid, vnum, version)
+        zchead = self.data_head(mobile, 256, zcbody, 1, version)
         zcdata = self.add_all((zchead + zcbody))
         return zcdata
 
     def Authentication(self,Acode, mobile,version=0):
         """组装鉴权信息"""
-        if version == 0:
-            jqbody = self.data_jq_body(Acode)
-            jqhead = self.data_head(mobile, 258, jqbody, 2)
-
-        else:
-            jqbody = self.data_jq_body_2019(Acode)
-            jqhead = self.data_head_2019(mobile, 258, jqbody, 2,version)
-
+        jqbody = self.data_jq_body(Acode, version)
+        jqhead = self.data_head(mobile, 258, jqbody, 2, version)
         jqdata = self.add_all((jqhead + jqbody))
         return jqdata
 
@@ -452,9 +411,6 @@ class mytool(object):
         else:
             gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
         gpshead = self.data_head(mobile, messageid, gpsbody, 3, version)
-        #if version==0:
-        # else:
-        #     gpshead = self.data_head_2019(mobile, messageid, gpsbody, 3,version)
         gpsdata = self.add_all(gpshead + gpsbody)
         return gpsdata
 
@@ -462,11 +418,6 @@ class mytool(object):
         """组装心跳信息"""
         hbody = []
         hhead = self.data_head(mobile,  2, hbody, 1, version)
-        # if version==0:
-        #     hhead = self.data_head(mobile, 2, hbody, 1)
-        # else:
-        #     hhead = self.data_head_2019(mobile, 2, hbody, 1,version)
-
         data = self.add_all(hhead)
         return data
 
