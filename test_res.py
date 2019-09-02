@@ -47,7 +47,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     2.idlist：外设及传感器附加信息
     3.wsid：主动安全报警附加信息
     """
-    extrainfo_id = [1]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
+    extrainfo_id = [1,6]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
     idlist = [0]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
     wsid = [0]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
@@ -59,12 +59,12 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     statu = 1 #0x01：从业资格证 IC 卡插入（驾驶员上班）； 0x02：从业资格证 IC 卡拔出（驾驶员下班）
     result = 0 #0x00：IC 卡读卡成功；0x01：读卡失败，原因为卡片密钥认证未通过；0x02：读卡失败，原因为卡片已被锁定； 0x03：读卡失败，原因为卡片被拔出； 0x04：读卡失败，原因为数据校验错误。
     institutions = "重庆市渝中区大坪" #发证机构名称
-    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions)
+    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'])
     tp.send_data(link, drivers)
 
     # 数据库操作
     #     dbop.interface_db(tp,testlibrary)
-    auto = 1;  # 是否要跑自动化脚本？
+    auto = 0;  # 是否要跑自动化脚本？
 
     if (pdict['ti'] != 0):  # 补传数据
         buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
@@ -151,9 +151,9 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "218.78.40.57"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6995  # 6994川标,6995冀标，6975部标
+port = 6973  # 6994川标,6995冀标，6975部标
 deviceid =1040000
 mobile = 13100040000
 vnum = u"渝B40000"

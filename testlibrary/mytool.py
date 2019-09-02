@@ -388,7 +388,9 @@ class mytool(object):
             elif i == 2:
                 data += self.add_oil(i, oil)#油量，WORD，1/10L，对应车上油量表读数
             elif i == 3:
-                data += self.add_speed(i, speed)#行驶记录功能获取的速度，WORD，1/10km/h
+                data += self.add_speed(i, extra_speed)#行驶记录功能获取的速度，WORD，1/10km/h
+            elif i == 6:
+                data +=self.add_additional(i,2,32769)
             elif i == 48:
                 data += self.add_by(i, by)#无线通信网络信号强度
             elif i == 49:
@@ -467,27 +469,25 @@ class mytool(object):
         :param name:驾驶员姓名
         :param qualification: 从业资格证编码
         :param institutions:发证机构名称
-        :param version: 版本，用于区分2013-808和2019-808协议
+        :param version: 版本，用于区分2013-808和2019-808协议；1表示2019-808协议；0表示2013-808
         :return:返回组装后的驾驶员信息
         """
         ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
         dnlength=len(jctool.character_string(name))/2 #驾驶员姓名长度
         znlength =len(jctool.character_string(institutions))/2 #发证机构名称长度
+        dbody0 = jctool.to_hex(statu, 2) + str(ti)
+        dbody1 = dbody0 + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,2) + jctool.character_string(institutions) + "20200908"
         if version==0:
-            if statu==1:
-                dbody = jctool.to_hex(statu, 2) + str(ti) + jctool.to_hex(result, 2) + jctool.to_hex(dnlength, \
-                        2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength, \
-                        2) + jctool.character_string(institutions) + "20200908"
-            elif statu == 2:
-                dbody = jctool.to_hex(statu, 2) + str(ti)
-            hhead = self.data_head(mobile, 1794, dbody, 1)
-        else:
             if statu == 1:
-                dbody = jctool.to_hex(statu, 2) + str(ti) + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,\
-                    2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,\
-                    2) + jctool.character_string(institutions) + "20200908" + jctool.character_string(qualification, 20)
-            elif statu==2:
-                dbody = jctool.to_hex(statu, 2) + str(ti)
+                dbody = dbody1
+            elif statu == 2:
+                dbody = dbody0
+            hhead = self.data_head(mobile, 1794, dbody, 1)
+        elif version==1 :
+            if statu == 1:
+                dbody = dbody1 + jctool.character_string(qualification, 20)
+            elif statu == 2:
+                dbody = dbody0
             hhead = self.data_head_2019(mobile, 1794, dbody, 1,version)
 
         data = self.add_all(hhead+dbody)
@@ -553,6 +553,17 @@ class mytool(object):
         data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(speed), 4)
         return data
 
+    def add_additional(self, id, size,information):
+        '''
+            附加信息
+            :param id: 附加信息ＩＤ
+            :param size: 附加信息长度
+            :param information: 附加信息
+            :return: 组装的附加信息
+                           '''
+        #oil = float(speed) * 10
+        data = jctool.to_hex(id, 2) + jctool.to_hex(size, 2) + jctool.to_hex(information, size*2)
+        return data
         # 信号强度
     def add_by(self, id, by):
         '''
