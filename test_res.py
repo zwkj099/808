@@ -113,31 +113,30 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                     # 根据下发报文判断需要响应内容
                     id = res[2:6]
                     answer_number = res[22:26]
-                    reno = "01"
-
-                    if id in ["8201", "8202","8802"]:
+                    reno = "00"
+                    if id in ["8201", "8202","8802","8500"]:
                         reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
 
                     else:
-                        reply.reply(link, i, mobile, id, answer_number)
+                        reply.reply(tp,link, i, mobile, id, answer_number, reno,pdict['version'])
 
                 t = int(time.strftime("%H%M%S", time.localtime()))
             else:
                 try:
-                    reno = "01"
+                    reno = "00"
                     res = tp.receive_data(link)
                     res = tp.dd(res)
                     id = res[2:6]
                     answer_number = res[22:26]  # 应答流水号
                     # 切割响应
-                    # list=ano_res(res)
-                    if id in ["8201", "8202","8802"]:
+                    #list=ano_res(res)
+                    if id in ["8201", "8202","8802","8500"]:
                         try:
                             reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
                         except Exception as e:
                             print e
                     else:
-                        reply.reply(link, res, mobile, id, answer_number, reno)
+                        reply.reply(tp,link, res, mobile, id, answer_number, reno,pdict['version'])
 
                 except:
                     pass
@@ -158,8 +157,8 @@ deviceid =1040000
 mobile = 13100040000
 vnum = u"渝B40000"
 cont = 0
-name = "艾丽11"
-qualification = 14003529463400352903
+name = "艾丽12"
+qualification = 14003529463400352904
 thread_list = []
 for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification))
