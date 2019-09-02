@@ -94,7 +94,7 @@ class read_configfile(object):
     
         # 808附加信息相关参数
         extrainfos=[ex808dict['vedio_alarm'], ex808dict['vedio_signal'], ex808dict['memery'], ex808dict['abnormal_driving'],\
-                    ex808dict['mel'], ex808dict['oil'], ex808dict['extra_speed'], ex808dict['by'], ex808dict['wn']]
+                    ex808dict['mel'], ex808dict['oil'], ex808dict['extra_speed'], ex808dict['by'], ex808dict['wn'],ex808dict['temper']]
     
         #外设传感器相关参数
         oils=[sensordict['AD'],sensordict['Oil'],pdict['high'],sensordict['addoil']]#油量传感器参数
