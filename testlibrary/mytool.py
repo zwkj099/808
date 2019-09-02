@@ -372,29 +372,32 @@ class mytool(object):
 
         # 组装附加信息
     def extra_info(self, ids=None, extrainfos=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
-        vedio_alarm, vedio_signal, memery, abnormal_driving, meilage, oil, extra_speed, by, wn=extrainfos
+        vedio_alarm, vedio_signal, memery, abnormal_driving, meilage, oil, extra_speed, by, wn,temper=extrainfos
         data = ""
         for i in ids:
-            if i == 20:
-                data += self.add_vedio_alarm(i, vedio_alarm)#视频相关报警
-            elif i in (21, 22):
-                data += self.add_vedio_signal_sta(i, vedio_signal)#视频信号丢失报警状态、视频信号遮挡报警状态
-            elif i == 23:
-                data += self.add_memery_trouble_sta(i, memery)#存储器故障报警状态
-            elif i == 24:
-                data += self.add_Abnormal_driving_sta(i, abnormal_driving)#异常驾驶行为报警详细描述
-            elif i == 1:
-                data += self.add_meliage(i, meilage)#里程，DWORD，1/10km，对应车上里程表读数
+            if i == 1:
+                meilage = int(float(meilage) * 10)  #里程，DWORD，1/10km，对应车上里程表读数
+                data += self.add_additional(i, 4, meilage)
             elif i == 2:
-                data += self.add_oil(i, oil)#油量，WORD，1/10L，对应车上油量表读数
+                oil = int(float(oil) * 10) #油量，WORD，1/10L，对应车上油量表读数
+                data += self.add_additional(i, 2, oil)
             elif i == 3:
-                data += self.add_speed(i, extra_speed)#行驶记录功能获取的速度，WORD，1/10km/h
+                speed = int(float(extra_speed) * 10)#行驶记录功能获取的速度，WORD，1/10km/h
+                data += self.add_additional(i, 2, speed)
             elif i == 6:
-                data +=self.add_additional(i,2,32769)
+                data +=self.add_additional(i,2,temper) #车箱温度
+            elif i == 20:
+                data += self.add_additional(i, 4, vedio_alarm)# 1078协议，视频相关报警
+            elif i in (21, 22):
+                data += self.add_additional(i, 4, vedio_signal)  # 1078协议，视频信号丢失报警状态、视频信号遮挡报警状态
+            elif i == 23:
+                data += self.add_additional(i, 2, memery)# 1078协议，存储器故障报警状态
+            elif i == 24:
+                data += self.add_additional(i, 2, abnormal_driving)#1078协议，异常驾驶行为报警详细描述
             elif i == 48:
-                data += self.add_by(i, by)#无线通信网络信号强度
+                data += self.add_additional(i, 1, by)#无线通信网络信号强度
             elif i == 49:
-                data += self.add_wn(i, wn) #GNSS 定位卫星数
+                data += self.add_additional(i, 1, wn)#GNSS 定位卫星数
             else:
                 print "无附加信息", i
                 data = ""
@@ -475,8 +478,9 @@ class mytool(object):
         ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
         dnlength=len(jctool.character_string(name))/2 #驾驶员姓名长度
         znlength =len(jctool.character_string(institutions))/2 #发证机构名称长度
-        dbody0 = jctool.to_hex(statu, 2) + str(ti)
-        dbody1 = dbody0 + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,2) + jctool.character_string(institutions) + "20200908"
+
+        dbody0 = jctool.to_hex(statu, 2) + str(ti)#拔卡上传信息
+        dbody1 = dbody0 + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,2) + jctool.character_string(institutions) + "20200908"#插卡上传信息
         if version==0:
             if statu == 1:
                 dbody = dbody1
@@ -519,40 +523,6 @@ class mytool(object):
         return str(data)
 
     #组装附加信息
-    #里程
-    def add_meliage(self, id, meliage):
-        '''
-                   里程附加信息0104
-                   :param meliage: 里程值，单位km，支持一位小数
-                   :return: 里程附加信息
-                   '''
-        meliage = float(meliage) * 10
-        data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(int(meliage), 8)
-        return data
-
-
-    # 油量
-    def add_oil(self, id, oil):
-        '''
-                  油量附加信息
-                  :param oil: 油量值，单位L，支持一位小数
-                  :return: 0202油量附加信息
-                  '''
-        oil = float(oil) * 10
-        data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(oil), 4)
-        return data
-
-        # 速度
-    def add_speed(self, id, speed):
-        '''
-         附加速度信息
-          :param speed: 速度值，单位km/h，支持一位小数
-          :return: 0302速度附加信息
-                       '''
-        oil = float(speed) * 10
-        data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(speed), 4)
-        return data
-
     def add_additional(self, id, size,information):
         '''
             附加信息
@@ -561,66 +531,98 @@ class mytool(object):
             :param information: 附加信息
             :return: 组装的附加信息
                            '''
-        #oil = float(speed) * 10
         data = jctool.to_hex(id, 2) + jctool.to_hex(size, 2) + jctool.to_hex(information, size*2)
         return data
-        # 信号强度
-    def add_by(self, id, by):
-        '''
-                    附加信号强度信息
-                    :param by: 信号强度值
-                    :return: 3001信号强度报文
-                    '''
-        data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(by), 2)
-        return data
-
-        # 卫星数量
-    def add_wn(self, id, wn):
-        '''
-                    附加卫星数量
-                    :param wn: 卫星数量
-                    :return: 3101卫星数量附加报文
-                    '''
-        data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(wn), 2)
-        return data
+    #里程
+    # def add_meliage(self, id, meliage):
+    #     '''
+    #                里程附加信息0104
+    #                :param meliage: 里程值，单位km，支持一位小数
+    #                :return: 里程附加信息
+    #                '''
+    #     meliage = float(meliage) * 10
+    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(int(meliage), 8)
+    #     return data
 
 
-        # 音视频报警信息
-    def add_vedio_alarm(self, id, vedio_alarm):
-        '''
-                    :param vedio_alarm: 视频相关报警
-                    :return: 1404视频相关报警附件报文
-                    '''
-        data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_alarm, 8)
-        return data
+    # # 油量
+    # def add_oil(self, id, oil):
+    #     '''
+    #               油量附加信息
+    #               :param oil: 油量值，单位L，支持一位小数
+    #               :return: 0202油量附加信息
+    #               '''
+    #     oil = float(oil) * 10
+    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(oil), 4)
+    #     return data
+    #
+    #     # 速度
+    # def add_speed(self, id, speed):
+    #     '''
+    #      附加速度信息
+    #       :param speed: 速度值，单位km/h，支持一位小数
+    #       :return: 0302速度附加信息
+    #                    '''
+    #     oil = float(speed) * 10
+    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(speed), 4)
+    #     return data
+    #     # 信号强度
+    # def add_by(self, id, by):
+    #     '''
+    #                 附加信号强度信息
+    #                 :param by: 信号强度值
+    #                 :return: 3001信号强度报文
+    #                 '''
+    #     data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(by), 2)
+    #     return data
+    #
+    #     # 卫星数量
+    # def add_wn(self, id, wn):
+    #     '''
+    #                 附加卫星数量
+    #                 :param wn: 卫星数量
+    #                 :return: 3101卫星数量附加报文
+    #                 '''
+    #     data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(wn), 2)
+    #     return data
 
 
-        # 视频信号丢失报警状态
-    def add_vedio_signal_sta(self, id, vedio_signal):
-        '''
-                    :param vedio_signal:
-                    :return:
-                    '''
-        data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_signal, 8)
-        return data
-
-        # 存储器故障报警状态
-    def add_memery_trouble_sta(self, id, memery):
-        '''
-                   :param memery:
-                   :return:
-                   '''
-        data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(memery, 4)
-        return data
-
-        # 异常驾驶行为报警详细描述
-    def add_Abnormal_driving_sta(self, id, abnormal_driving):
-        '''
-                    :param abnormal_driving:
-                    :return:
-                    '''
-        data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(abnormal_driving, 4)
-        return data
+    #     # 音视频报警信息
+    # def add_vedio_alarm(self, id, vedio_alarm):
+    #     '''
+    #                 :param vedio_alarm: 视频相关报警
+    #                 :return: 1404视频相关报警附件报文
+    #                 '''
+    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_alarm, 8)
+    #     return data
+    #
+    #
+    #     # 视频信号丢失报警状态
+    # def add_vedio_signal_sta(self, id, vedio_signal):
+    #     '''
+    #                 :param vedio_signal:
+    #                 :return:
+    #                 '''
+    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_signal, 8)
+    #     return data
+    #
+    #     # 存储器故障报警状态
+    # def add_memery_trouble_sta(self, id, memery):
+    #     '''
+    #                :param memery:
+    #                :return:
+    #                '''
+    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(memery, 4)
+    #     return data
+    #
+    #     # 异常驾驶行为报警详细描述
+    # def add_Abnormal_driving_sta(self, id, abnormal_driving):
+    #     '''
+    #                 :param abnormal_driving:
+    #                 :return:
+    #                 '''
+    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(abnormal_driving, 4)
+    #     return data
 
     #组装传感器信息
     def add_f3_data(self,num,data_body):
