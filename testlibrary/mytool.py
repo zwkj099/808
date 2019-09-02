@@ -175,7 +175,7 @@ class mytool(object):
         if messageid in (512,2050):
             body = jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin,8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body #+ meliage + f3body
             return body
-        if  messageid == 513:
+        if  messageid in (513,1280):
             body =answer_number +  jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body
             print body
             return body
@@ -451,20 +451,21 @@ class mytool(object):
             gpsbody = answer_number + "0001" + "00000001" + "000100" + self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,-1, answer_number)
         else:
             gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
-        if version==0:
-            gpshead = self.data_head(mobile, messageid, gpsbody, 3)
-        else:
-            gpshead = self.data_head_2019(mobile, messageid, gpsbody, 3,version)
+        gpshead = self.data_head(mobile, messageid, gpsbody, 3, version)
+        #if version==0:
+        # else:
+        #     gpshead = self.data_head_2019(mobile, messageid, gpsbody, 3,version)
         gpsdata = self.add_all(gpshead + gpsbody)
         return gpsdata
 
     def heartbeat(self, mobile,version=0):
         """组装心跳信息"""
         hbody = []
-        if version==0:
-            hhead = self.data_head(mobile, 2, hbody, 1)
-        else:
-            hhead = self.data_head_2019(mobile, 2, hbody, 1,version)
+        hhead = self.data_head(mobile,  2, hbody, 1, version)
+        # if version==0:
+        #     hhead = self.data_head(mobile, 2, hbody, 1)
+        # else:
+        #     hhead = self.data_head_2019(mobile, 2, hbody, 1,version)
 
         data = self.add_all(hhead)
         return data
@@ -485,20 +486,13 @@ class mytool(object):
         znlength =len(jctool.character_string(institutions))/2 #发证机构名称长度
 
         dbody0 = jctool.to_hex(statu, 2) + str(ti)#拔卡上传信息
-        dbody1 = dbody0 + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,2) + jctool.character_string(institutions) + "20200908"#插卡上传信息
-        if version==0:
-            if statu == 1:
-                dbody = dbody1
-            elif statu == 2:
-                dbody = dbody0
-            hhead = self.data_head(mobile, 1794, dbody, 1)
-        elif version==1 :
-            if statu == 1:
-                dbody = dbody1 + jctool.character_string(qualification, 20)
-            elif statu == 2:
-                dbody = dbody0
-            hhead = self.data_head_2019(mobile, 1794, dbody, 1,version)
+        dbody = dbody0 + jctool.to_hex(result, 2) + jctool.to_hex(dnlength,2) + jctool.character_string(name) + jctool.character_string(qualification, 20) + jctool.to_hex(znlength,2) + jctool.character_string(institutions) + "20200908"#插卡上传信息
 
+        if statu == 2:
+            dbody = dbody0
+        elif statu == 1 and version==1 :
+            dbody = dbody + jctool.character_string(qualification, 20)
+        hhead = self.data_head(mobile, 1794, dbody, 1,version)
         data = self.add_all(hhead+dbody)
         return data
 
