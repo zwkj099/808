@@ -51,3 +51,7 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
         pdict['messageid'] = 2050
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
         pdict['messageid'] = 512
+    elif id == "8500":
+        pdict['messageid'] = 1280
+        upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
+        pdict['messageid'] = 512
