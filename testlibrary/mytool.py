@@ -25,7 +25,7 @@ class mytool(object):
         pass
 
     # 组装head头，传入参数包括手机号，消息id，消息体，流水号（可不传，默认0000）
-    def data_head(self, mobile, newid, data, xulie=1):
+    def data_head(self, mobile, newid, data, xulie=1,version=0):
         '''
         组装消息头
         :param mobile: 手机号
@@ -34,10 +34,15 @@ class mytool(object):
         :param xulie:消息流水号，默认0000
         :return:对应消息id的消息头信息
         '''
-        lenth = len(data)/2
-        while len(mobile) < 12:
-            mobile = "0" + mobile
-        head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+        lenth = len(data) / 2
+        if version==0:
+            while len(mobile) < 12:
+                mobile = "0" + mobile
+            head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+        elif version==1:
+            while len(mobile) < 20:
+                mobile = "0" + mobile
+            head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
         return head
 
     def data_head_2019(self, mobile, newid, data, xulie=1,version=1):
