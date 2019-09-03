@@ -108,7 +108,6 @@ class mytool(object):
     #     return body
 
     def Position_New(self,messageid ,number=0,type=0,alarm=0, status=0, jin=0, wei=0, high=0, speed=0, ti=0, direction=0,f3body=-1,answer_number=0000 ):
-
         '''
        组装位置信息，通过messageid判断是发单条位置还是发批量位置信息
         :param messageid :消息ID
@@ -130,38 +129,32 @@ class mytool(object):
         jin = float(jin) * 1000000
         wei = float(wei) * 1000000
         speed = float(speed) * 10
-        #判断是否组装里程数据
-        # if meliage==-1:
-        #     meliage=""
-        # elif meliage>=0:
-        #     meliage = float(meliage) * 10
-        #     meliage = "0104" + jctool.to_hex(int(meliage), 8)
         if f3body==-1:
             f3body=""
-
+        data0=jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin,8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) +jctool.to_hex(direction, 4)
         # ti如果传入0,表示取当前系统时间
         if int(ti) == 0:
             ti = time.strftime("%y%m%d%H%M%S", time.localtime())
 
-        if messageid in (512,2050):
-            body = jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin,8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body #+ meliage + f3body
+        if messageid in (512,2050,1796):
+            body = data0+ str(ti) + f3body #+ meliage + f3body
             return body
         if  messageid in (513,1280):
-            body =answer_number +  jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body
+            body =answer_number + data0+ str(ti) + f3body
             print body
             return body
-        elif messageid==1796:
-            data = ""
-            b = number
-            while b >= 1:
-                b = b - 1
-                body = jctool.to_hex(alarm, 8) + jctool.to_hex(status, 8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin,8) + jctool.to_hex(high, 4) + jctool.to_hex(speed, 4) + jctool.to_hex(direction, 4) + str(ti) + f3body
-                lenth = len(body) / 2
-                data = data + jctool.to_hex(lenth, 4) + body
-                time.sleep(1)  # 避免批量位置时间一样
-
-            data = jctool.to_hex(number, 4) + jctool.to_hex(type, 2) + data
-            return data
+        # elif messageid==1796:
+        #     data = ""
+        #     b = number
+        #     while b >= 1:
+        #         b = b - 1
+        #         body = data0 + str(ti) + f3body
+        #         lenth = len(body) / 2
+        #         data = data + jctool.to_hex(lenth, 4) + body
+        #         time.sleep(2)  # 避免批量位置时间一样
+        #         ti = time.strftime("%y%m%d%H%M%S", time.localtime())
+        #     data = jctool.to_hex(number, 4) + jctool.to_hex(type, 2) + data
+        #     return data
         else:
             print "消息ID有误，请输入位置消息ID 512或1796"
 
@@ -413,7 +406,19 @@ class mytool(object):
         """
         attach=str(extra_info)+zd_body+F3data
         if messageid == 2050:
-            gpsbody = answer_number + "0001" + "00000001" + "000100" + self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,-1, answer_number)
+            """应答流水+多媒体数据总项数+检索项{多媒体ＩＤ(dword)+多媒体类型(b)+通道ＩＤ(b)+事件项编码(b)+位置}"""
+            gpsbody = answer_number + "0001" + "00000001" + "020707" + self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,-1, answer_number)
+        elif messageid == 1796:
+            body=""
+            NO=number
+            while NO!=0:
+                gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
+                lenth = len(gpsbody) / 2
+                data = jctool.to_hex(lenth, 4) + gpsbody
+                NO -=1
+                body=data+body
+                time.sleep(2)
+            gpsbody=jctool.to_hex(number, 4) + jctool.to_hex(type, 2) + body
         else:
             gpsbody = self.Position_New(messageid, number, type, alarm, status, jin, wei, high, speed, ti, direction,attach, answer_number)
         gpshead = self.data_head(mobile, messageid, gpsbody, 3, version)

@@ -86,6 +86,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
         while True:
             if abs(int(time.strftime("%H%M%S", time.localtime())) - t) >= pdict['period']:
                 ex808dict['mel'] += 1
+                #info[1][4] +=1
                 sensordict['AD'] += 1
                 sensordict['Oil'] += 1
                 pdict['high'] += 1
