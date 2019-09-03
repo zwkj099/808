@@ -32,6 +32,7 @@ class mytool(object):
         :param newid:消息id，如0100,0200
         :param data:消息体，包括基本信息，附加信息，f3信息
         :param xulie:消息流水号，默认0000
+        :param version:协议版本，１表示808-2019，０表示808-2013
         :return:对应消息id的消息头信息
         '''
         lenth = len(data) / 2
@@ -50,6 +51,7 @@ class mytool(object):
         组装注册报文body
         :param deviceid: 设备号，7位数字字母
         :param vnum: 标准7位车牌号
+        :param version:协议版本，１表示808-2019，０表示808-2013
         :return: 注册报文body
         '''
         if version==0:
@@ -66,6 +68,7 @@ class mytool(object):
         '''
         从注册响应获取鉴权码，即鉴权报文body
         :param zcres: 注册时的响应,响应报文需处理为末端不带空格
+        :param version:协议版本，１表示808-2019，０表示808-2013
         :return: 鉴权报文body，即鉴权码
         '''
         if version==1:
@@ -80,31 +83,30 @@ class mytool(object):
             body=a
         return body
 
-    def data_gps_body(self, alarm, status, jin, wei, high, speed, ti, direction=random.randint(0, 359)):
-        '''
-        组装位置信息body
-        :param alarm: 报警标志位，传入0默认无报警,十进制数
-        :param status: 状态位，传入0默认定位，acc开，十进制数
-        :param jin:经度
-        :param wei: 纬度
-        :param high:高度
-        :param speed:速度
-        :param ti:时间，0默认当前时间
-        :param direction:方向
-        :return:位置报文基本信息
-        '''
-        #转化单位和格式
-        jin = float(jin) * 1000000
-        wei = float(wei) * 1000000
-        speed = float(speed) * 10
-        # ti如果传入0,表示取当前系统时间
-        if int(ti) == 0:
-            ti = time.strftime("%y%m%d%H%M%S", time.localtime())
-        body = jctool.to_hex(alarm,8) + jctool.to_hex(status,8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed,4) + jctool.to_hex(direction, 4) + str(ti)
-        print body
-        return body
+    # def data_gps_body(self, alarm, status, jin, wei, high, speed, ti, direction=random.randint(0, 359)):
+    #     '''
+    #     组装位置信息body
+    #     :param alarm: 报警标志位，传入0默认无报警,十进制数
+    #     :param status: 状态位，传入0默认定位，acc开，十进制数
+    #     :param jin:经度
+    #     :param wei: 纬度
+    #     :param high:高度
+    #     :param speed:速度
+    #     :param ti:时间，0默认当前时间
+    #     :param direction:方向
+    #     :return:位置报文基本信息
+    #     '''
+    #     #转化单位和格式
+    #     jin = float(jin) * 1000000
+    #     wei = float(wei) * 1000000
+    #     speed = float(speed) * 10
+    #     # ti如果传入0,表示取当前系统时间
+    #     if int(ti) == 0:
+    #         ti = time.strftime("%y%m%d%H%M%S", time.localtime())
+    #     body = jctool.to_hex(alarm,8) + jctool.to_hex(status,8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed,4) + jctool.to_hex(direction, 4) + str(ti)
+    #     print body
+    #     return body
 
-    #def Position_New(self, messageid, number=0, type=0, alarm=0, status=0, jin=0, wei=0, high=0, speed=0, ti=0,direction=0, meliage=-1, f3body=-1, answer_number=0000):
     def Position_New(self,messageid ,number=0,type=0,alarm=0, status=0, jin=0, wei=0, high=0, speed=0, ti=0, direction=0,f3body=-1,answer_number=0000 ):
 
         '''
@@ -163,47 +165,47 @@ class mytool(object):
         else:
             print "消息ID有误，请输入位置消息ID 512或1796"
 
-    def data_gps_body_0704(self, Number,type,alarm, status, jin, wei, high, speed, ti, direction,meliage=-1 ):
-        '''
-       组装0704批量位置信息body
-        :param Number:数据项个数
-        :param type:位置数据类型
-        :param alarm: 报警标志位，传入0默认无报警,十进制数
-        :param status: 状态位，传入0默认定位，acc开，十进制数
-        :param jin:经度
-        :param wei: 纬度
-        :param high:高度
-        :param speed:速度
-        :param ti:时间，0默认当前时间
-        :param direction:方向
-        :param meliage:里程，值为-1时表示无里程数据
-        :return:位置报文基本信息
-        '''
-        #转化单位和格式
-        jin = float(jin) * 1000000
-        wei = float(wei) * 1000000
-        speed = float(speed) * 10
-        #判断是否组装里程数据
-        if meliage==-1:
-            meliage=""
-        elif meliage>=0:
-                   meliage = float(meliage) * 10
-                   meliage = "0104" + jctool.to_hex(int(meliage), 8)
-        data=""
-        b=Number
-        # ti如果传入0,表示取当前系统时间
-        if int(ti) == 0:
-            ti = time.strftime("%y%m%d%H%M%S", time.localtime())
-
-        while b >=1:
-            b=b-1
-            body =jctool.to_hex(alarm,8) + jctool.to_hex(status,8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed,4) + jctool.to_hex(direction, 4) + str(ti)+meliage
-            lenth = len(body) / 2
-            data = data+jctool.to_hex(lenth,4)+body
-            time.sleep(1) #避免批量位置时间一样
-
-        data=jctool.to_hex(Number,4)+jctool.to_hex(type,2)+data
-        return data
+    # def data_gps_body_0704(self, Number,type,alarm, status, jin, wei, high, speed, ti, direction,meliage=-1 ):
+    #     '''
+    #    组装0704批量位置信息body
+    #     :param Number:数据项个数
+    #     :param type:位置数据类型
+    #     :param alarm: 报警标志位，传入0默认无报警,十进制数
+    #     :param status: 状态位，传入0默认定位，acc开，十进制数
+    #     :param jin:经度
+    #     :param wei: 纬度
+    #     :param high:高度
+    #     :param speed:速度
+    #     :param ti:时间，0默认当前时间
+    #     :param direction:方向
+    #     :param meliage:里程，值为-1时表示无里程数据
+    #     :return:位置报文基本信息
+    #     '''
+    #     #转化单位和格式
+    #     jin = float(jin) * 1000000
+    #     wei = float(wei) * 1000000
+    #     speed = float(speed) * 10
+    #     #判断是否组装里程数据
+    #     if meliage==-1:
+    #         meliage=""
+    #     elif meliage>=0:
+    #                meliage = float(meliage) * 10
+    #                meliage = "0104" + jctool.to_hex(int(meliage), 8)
+    #     data=""
+    #     b=Number
+    #     # ti如果传入0,表示取当前系统时间
+    #     if int(ti) == 0:
+    #         ti = time.strftime("%y%m%d%H%M%S", time.localtime())
+    #
+    #     while b >=1:
+    #         b=b-1
+    #         body =jctool.to_hex(alarm,8) + jctool.to_hex(status,8) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + jctool.to_hex(high, 4) + jctool.to_hex(speed,4) + jctool.to_hex(direction, 4) + str(ti)+meliage
+    #         lenth = len(body) / 2
+    #         data = data+jctool.to_hex(lenth,4)+body
+    #         time.sleep(1) #避免批量位置时间一样
+    #
+    #     data=jctool.to_hex(Number,4)+jctool.to_hex(type,2)+data
+    #     return data
 
     def zd_body(self,ids=None, zds=None):
         '''组装主动安全附加信息
@@ -379,14 +381,18 @@ class mytool(object):
 
 
     def register(self,deviceid, vnum, mobile,version=0):
-        """组装注册信息"""
+        """组装注册信息
+        :param version:协议版本，１表示808-2019，０表示808-2013
+        """
         zcbody = self.data_zc_body(deviceid, vnum, version)
         zchead = self.data_head(mobile, 256, zcbody, 1, version)
         zcdata = self.add_all((zchead + zcbody))
         return zcdata
 
     def Authentication(self,Acode, mobile,version=0):
-        """组装鉴权信息"""
+        """组装鉴权信息
+        :param version:协议版本，１表示808-2019，０表示808-2013
+        """
         jqbody = self.data_jq_body(Acode, version)
         jqhead = self.data_head(mobile, 258, jqbody, 2, version)
         jqdata = self.add_all((jqhead + jqbody))
@@ -401,7 +407,7 @@ class mytool(object):
         :param type:位置数据类型，批量位置信息时有效（1796）
         :param zd_body: 主动安全信息
         :param F3data:F3信息
-        :param version: 版本，用于区分2013-808和2019-808协议
+        :param version:协议版本，１表示808-2019，０表示808-2013
         :param answer_number:应答流水号
         :return:返回组装后的位置信息
         """
@@ -415,7 +421,9 @@ class mytool(object):
         return gpsdata
 
     def heartbeat(self, mobile,version=0):
-        """组装心跳信息"""
+        """组装心跳信息
+        :param version:协议版本，１表示808-2019，０表示808-2013
+        """
         hbody = []
         hhead = self.data_head(mobile,  2, hbody, 1, version)
         data = self.add_all(hhead)
@@ -429,7 +437,7 @@ class mytool(object):
         :param name:驾驶员姓名
         :param qualification: 从业资格证编码
         :param institutions:发证机构名称
-        :param version: 版本，用于区分2013-808和2019-808协议；1表示2019-808协议；0表示2013-808
+        :param version:协议版本，１表示808-2019，０表示808-2013
         :return:返回组装后的驾驶员信息
         """
         ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
@@ -483,96 +491,6 @@ class mytool(object):
                            '''
         data = jctool.to_hex(id, 2) + jctool.to_hex(size, 2) + jctool.to_hex(information, size*2)
         return data
-    #里程
-    # def add_meliage(self, id, meliage):
-    #     '''
-    #                里程附加信息0104
-    #                :param meliage: 里程值，单位km，支持一位小数
-    #                :return: 里程附加信息
-    #                '''
-    #     meliage = float(meliage) * 10
-    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(int(meliage), 8)
-    #     return data
-
-
-    # # 油量
-    # def add_oil(self, id, oil):
-    #     '''
-    #               油量附加信息
-    #               :param oil: 油量值，单位L，支持一位小数
-    #               :return: 0202油量附加信息
-    #               '''
-    #     oil = float(oil) * 10
-    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(oil), 4)
-    #     return data
-    #
-    #     # 速度
-    # def add_speed(self, id, speed):
-    #     '''
-    #      附加速度信息
-    #       :param speed: 速度值，单位km/h，支持一位小数
-    #       :return: 0302速度附加信息
-    #                    '''
-    #     oil = float(speed) * 10
-    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(int(speed), 4)
-    #     return data
-    #     # 信号强度
-    # def add_by(self, id, by):
-    #     '''
-    #                 附加信号强度信息
-    #                 :param by: 信号强度值
-    #                 :return: 3001信号强度报文
-    #                 '''
-    #     data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(by), 2)
-    #     return data
-    #
-    #     # 卫星数量
-    # def add_wn(self, id, wn):
-    #     '''
-    #                 附加卫星数量
-    #                 :param wn: 卫星数量
-    #                 :return: 3101卫星数量附加报文
-    #                 '''
-    #     data = jctool.to_hex(id, 2) + "01" + jctool.to_hex(int(wn), 2)
-    #     return data
-
-
-    #     # 音视频报警信息
-    # def add_vedio_alarm(self, id, vedio_alarm):
-    #     '''
-    #                 :param vedio_alarm: 视频相关报警
-    #                 :return: 1404视频相关报警附件报文
-    #                 '''
-    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_alarm, 8)
-    #     return data
-    #
-    #
-    #     # 视频信号丢失报警状态
-    # def add_vedio_signal_sta(self, id, vedio_signal):
-    #     '''
-    #                 :param vedio_signal:
-    #                 :return:
-    #                 '''
-    #     data = jctool.to_hex(id, 2) + "04" + jctool.to_hex(vedio_signal, 8)
-    #     return data
-    #
-    #     # 存储器故障报警状态
-    # def add_memery_trouble_sta(self, id, memery):
-    #     '''
-    #                :param memery:
-    #                :return:
-    #                '''
-    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(memery, 4)
-    #     return data
-    #
-    #     # 异常驾驶行为报警详细描述
-    # def add_Abnormal_driving_sta(self, id, abnormal_driving):
-    #     '''
-    #                 :param abnormal_driving:
-    #                 :return:
-    #                 '''
-    #     data = jctool.to_hex(id, 2) + "02" + jctool.to_hex(abnormal_driving, 4)
-    #     return data
 
     #组装传感器信息
     def add_f3_data(self,num,data_body):
