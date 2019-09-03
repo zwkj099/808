@@ -53,7 +53,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
 
     link = tp.tcp_link(ip, port)
     # 注册、鉴权、心跳
-    Rah.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
+    upload_location.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
 
     # 发送驾驶员信息
     statu = 1 #0x01：从业资格证 IC 卡插入（驾驶员上班）； 0x02：从业资格证 IC 卡拔出（驾驶员下班）
@@ -66,12 +66,10 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     #     dbop.interface_db(tp,testlibrary)
     auto = 0;  # 是否要跑自动化脚本？
 
-    if (pdict['ti'] != 0):  # 补传数据
-        buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
-
-    elif auto == 1:  # 是否要跑自动化脚本？
+    if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
-
+    # elif (pdict['ti'] != 0):  # 补传数据
+    #     buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
     else:  # 正常上传位置信息
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
         res = tp.receive_data(link)
