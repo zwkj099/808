@@ -11,7 +11,6 @@ import reply
 from config import readconfig
 import db_operation
 from comman import buchuan, upload_location, reply_position
-from comman import Register_authentication_Heartbeat as Rah
 from auto_test import auto_test
 
 tp = testlibrary.testlibrary()
