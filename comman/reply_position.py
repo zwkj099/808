@@ -47,11 +47,11 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
             time.sleep(nu)
             i += 1
             print "第%d次发送跟踪信息：" % i
-    elif id == "8802":
+    elif id == "8802":#存储多媒体数据检索
         pdict['messageid'] = 2050
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
         pdict['messageid'] = 512
-    elif id == "8500":
+    elif id == "8500":#终端控制－加解锁
         pdict['messageid'] = 1280
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
         pdict['messageid'] = 512
