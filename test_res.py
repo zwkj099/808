@@ -112,7 +112,11 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                 for j in list:
                     # 根据下发报文判断需要响应内容
                     id = res[2:6]
-                    answer_number = res[22:26]
+                    # 应答流水号
+                    if pdict['version']==0:
+                        answer_number = res[22:26]
+                    elif pdict['version']==1:
+                        answer_number = res[32:36]
                     reno = "00"
                     if id in ["8201", "8202","8802","8500"]:
                         reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
@@ -127,7 +131,11 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                     res = tp.receive_data(link)
                     res = tp.dd(res)
                     id = res[2:6]
-                    answer_number = res[22:26]  # 应答流水号
+                    # 应答流水号
+                    if pdict['version']==0:
+                        answer_number = res[22:26]
+                    elif pdict['version']==1:
+                        answer_number = res[32:36]
                     # 切割响应
                     #list=ano_res(res)
                     if id in ["8201", "8202","8802","8500"]:
@@ -157,8 +165,8 @@ deviceid =1040000
 mobile = 13100040000
 vnum = u"渝B40000"
 cont = 0
-name = "艾丽12"
-qualification = 14003529463400352904
+name = "艾丽13"
+qualification = 14003529463400352905
 thread_list = []
 for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification))
