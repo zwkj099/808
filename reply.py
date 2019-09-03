@@ -44,7 +44,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
 
         # 平台下发指令8106，查询指定终端参数
         elif id == "8106":
-            search_body = get_loadres_body(res)
+            search_body = get_loadres_body(res,answer_number,version)
             search_head = tp.data_head(mobile, 260, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
             tp.send_data(link, search_data)
@@ -63,33 +63,42 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             usual_head = tp.data_head(mobile, 1, usual_body, 5, version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
-            # Answer_0900(link, mobile, res[34:36], answer_number, reno)  # 应答0900
+            # 获取下发的透传类型
             if version==0:
                 typ = res[30:32]
+                sensor = res[34:36]
             elif version==1:
                 typ = res[36:38]
                 sensor = res[40:42]
+            # 透传类型为Ｆ３协议时，组装应答数据
             if typ=="F6":
                 usual_body = "F301" + sensor + "03" + answer_number + reno
-            else:
-                usual_body = typ+ "550205"
+            else:# 透传类型为非Ｆ３协议时，组装应答数据；实时监控的原始指令下发
+                usual_body = typ+ "323034393338303233393834303233383430393332383432333432333432346F6F6F6F6FB0A2C0ADC9BDBFDABDB2B5C0C0EDC8F8BFCBBDA8B5B5C1A2BFA8313235393939313233343536373839313233343536373839313233343536373839313131313233343536373839313233343536373839313233343536373839313131"
             usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
             result = tp.add_all(usual_head + usual_body)
             tp.send_data(link, result)
         # 平台下发指令8103，传感器参数设置
         elif id == "8103":
-            # Usual(link, mobile, id, answer_number, reno)  # 应答通用应答
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
-            if tp.to_int(res[28:34]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
-                # Answer_0900(link,mobile, res[34:36], answer_number, reno)
-                sensor = res[34:36]
-                usual_body = "F301" + sensor + "03" + answer_number + reno
-                usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
-                result = tp.add_all(usual_head + usual_body)
-                tp.send_data(link, result)
+            if version==0:
+                if tp.to_int(res[28:34]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+                    sensor = res[34:36]
+                    usual_body = "F301" + sensor + "03" + answer_number + reno
+                    usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
+                    result = tp.add_all(usual_head + usual_body)
+                    tp.send_data(link, result)
+            elif version==1:
+                if tp.to_int(res[38:44]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+                    sensor = res[44:46]
+                    usual_body = "F301" + sensor + "03" + answer_number + reno
+                    usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
+                    result = tp.add_all(usual_head + usual_body)
+                    tp.send_data(link, result)
+
 
     except:
         pass
@@ -99,11 +108,11 @@ def get_usyal_body(id,ac,reno="00"):
     return body
 
 #组装读取指令应答body
-def get_loadres_body(data):
+def get_loadres_body(data,answer_number,version):
     #取得参数总数（可用于校验，未实现）
     total=data[26:28]
     #取得下发报文的流水号
-    ac=data[22:26]
+    ac=answer_number#data[22:26]
     #string类型id添加在这里
     list1=["00000083","00000049","00000048","00000040","00000041","00000042","00000043",
            "00000044","0000001D","0000001A","00000010","00000011","00000012","00000013",
@@ -116,7 +125,10 @@ def get_loadres_body(data):
     #byte[8]类型添加到这里
     list4=["00000110"]
     #DWORD类型放在else里面
-    body=data[28:-4]
+    if version ==1:
+        body=data[38:-4]
+    elif version==0:
+        body = data[28:-4]
     print "get_loadres_body(data)", body
     parbody=""
     x=0
