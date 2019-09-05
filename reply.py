@@ -7,7 +7,7 @@ import testlibrary
 import random
 import re
 import datetime
-tp=testlibrary.testlibrary()
+#tp=testlibrary.testlibrary()
 
 """
 1.持续发送位置，心跳报文
@@ -18,9 +18,9 @@ tp=testlibrary.testlibrary()
 6.多线程
 """
 
-def reply(link,res,mobile,id,answer_number):
+def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
     try:
-        reno = "00"
+        #reno = "00"
         """
         x += 1
         if x%5==1:
@@ -37,89 +37,68 @@ def reply(link,res,mobile,id,answer_number):
         """
         rlist = ["8103", "8106", "8107","8201", "8900", "8001"]
         if id not in rlist:
-            # Usual(link,mobile, id, answer_number, reno)
             usual_body = get_usyal_body(id, answer_number, reno)
-            usual_head = tp.data_head(mobile, 1, usual_body, 5)
+            usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
 
         # 平台下发指令8106，查询指定终端参数
         elif id == "8106":
-            search_body = get_loadres_body(res)
-            search_head = tp.data_head(mobile, 260, search_body, 5)
+            search_body = get_loadres_body(res,answer_number,version)
+            search_head = tp.data_head(mobile, 260, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
             tp.send_data(link, search_data)
-            #res = tp.receive_data(link)
 
         # 平台下发指令8107，查询终端属性
         elif id == "8107":
-            search2_body = get_0107body()
-            search2_head = tp.data_head(mobile, 263, search2_body, 5)
+            search2_body = get_0107body(version)
+            search2_head = tp.data_head(mobile, 263, search2_body, 5,version)
             search2_data = tp.add_all(search2_head + search2_body)
             print search2_data
             tp.send_data(link, search2_data)
 
             # 平台下发指令8900,油量标定数组
         elif id == "8900":
-            # Usual(link,mobile, id, answer_number, reno) # 应答通用应答
             usual_body = get_usyal_body(id, answer_number, reno)
-            usual_head = tp.data_head(mobile, 1, usual_body, 5)
+            usual_head = tp.data_head(mobile, 1, usual_body, 5, version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
-            # Answer_0900(link, mobile, res[34:36], answer_number, reno)  # 应答0900
-            sensor = res[34:36]
-            usual_body = "F301" + sensor + "03" + answer_number + reno
-            usual_head = tp.data_head(mobile, 2304, usual_body, 5)
+            # 获取下发的透传类型
+            if version==0:
+                typ = res[30:32]
+                sensor = res[34:36]
+            elif version==1:
+                typ = res[36:38]
+                sensor = res[40:42]
+            # 透传类型为Ｆ３协议时，组装应答数据
+            if typ=="F6":
+                usual_body = "F301" + sensor + "03" + answer_number + reno
+            else:# 透传类型为非Ｆ３协议时，组装应答数据；实时监控的原始指令下发
+                usual_body = typ+ "323034393338303233393834303233383430393332383432333432333432346F6F6F6F6FB0A2C0ADC9BDBFDABDB2B5C0C0EDC8F8BFCBBDA8B5B5C1A2BFA8313235393939313233343536373839313233343536373839313233343536373839313131313233343536373839313233343536373839313233343536373839313131"
+            usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
             result = tp.add_all(usual_head + usual_body)
             tp.send_data(link, result)
         # 平台下发指令8103，传感器参数设置
         elif id == "8103":
-            # Usual(link, mobile, id, answer_number, reno)  # 应答通用应答
             usual_body = get_usyal_body(id, answer_number, reno)
-            usual_head = tp.data_head(mobile, 1, usual_body, 5)
+            usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
-            if tp.to_int(res[28:34]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
-                # Answer_0900(link,mobile, res[34:36], answer_number, reno)
-                sensor = res[34:36]
-                usual_body = "F301" + sensor + "03" + answer_number + reno
-                usual_head = tp.data_head(mobile, 2304, usual_body, 5)
-                result = tp.add_all(usual_head + usual_body)
-                tp.send_data(link, result)
-        # 平台下发指令8201，位置信息查询
-        #elif id == "8201":
-            # 组装0201位置数据，包含油量数据、里程数据
-            # mel += 1
-            # AD += 1
-            # Oil += 1
-            # high += 1
-            # oils = [AD, Oil, high]
-            # gpsbody = tp.position(mobile, 513, 2, 0, alarm, status, jin, wei, high, speed, ti, direction, mel,
-            #                       tp.zd_body(wsid, zds), tp.f3_attach(idlist, oils, wds, sds, yhs, zfs, zzs, gss, lcs),
-            #                       version, answer_number)
-            # tp.send_data(link, gpsbody)
-        # 平台下发指令8202,跟踪
-        # elif id == "8202":
-        #     nu = tp.to_int(res[26:30])  # 获取回传间隔时间
-        #     tim = tp.to_int(res[30:38])  # 获取跟踪有效时长
-        #     print answer_number, nu, tim
-        #     # 应答通用应答
-        #     # Usual(link, mobile, id, answer_number, reno)
-        #     usual_body = get_usyal_body(id, answer_number, reno)
-        #     usual_head = tp.data_head(mobile, 1, usual_body, 5)
-        #     usual_redata = tp.add_all(usual_head + usual_body)
-        #     tp.send_data(link, usual_redata)
-        #     i = 0
-            # while i < tim / nu:
-            #     # 组装0202位置数据，包含油量数据、里程数据
-            #     gpsbody = tp.position(mobile, messageid, 2, 0, alarm, status, jin, wei, high, speed, ti, direction, mel,
-            #                           tp.zd_body(wsid, zds),
-            #                           tp.f3_attach(idlist, oils, wds, sds, yhs, zfs, zzs, gss, lcs),
-            #                           version, answer_number)
-            #     tp.send_data(link, gpsbody)
-            #     time.sleep(nu)
-            #     i += 1
-            #     print "第%d次发送跟踪信息：" % i
+            if version==0:
+                if tp.to_int(res[28:34]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+                    sensor = res[34:36]
+                    usual_body = "F301" + sensor + "03" + answer_number + reno
+                    usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
+                    result = tp.add_all(usual_head + usual_body)
+                    tp.send_data(link, result)
+            elif version==1:
+                if tp.to_int(res[38:44]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+                    sensor = res[44:46]
+                    usual_body = "F301" + sensor + "03" + answer_number + reno
+                    usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
+                    result = tp.add_all(usual_head + usual_body)
+                    tp.send_data(link, result)
+
 
     except:
         pass
@@ -129,11 +108,11 @@ def get_usyal_body(id,ac,reno="00"):
     return body
 
 #组装读取指令应答body
-def get_loadres_body(data):
+def get_loadres_body(data,answer_number,version):
     #取得参数总数（可用于校验，未实现）
     total=data[26:28]
     #取得下发报文的流水号
-    ac=data[22:26]
+    ac=answer_number#data[22:26]
     #string类型id添加在这里
     list1=["00000083","00000049","00000048","00000040","00000041","00000042","00000043",
            "00000044","0000001D","0000001A","00000010","00000011","00000012","00000013",
@@ -146,7 +125,10 @@ def get_loadres_body(data):
     #byte[8]类型添加到这里
     list4=["00000110"]
     #DWORD类型放在else里面
-    body=data[28:-4]
+    if version ==1:
+        body=data[38:-4]
+    elif version==0:
+        body = data[28:-4]
     print "get_loadres_body(data)", body
     parbody=""
     x=0
@@ -197,15 +179,19 @@ def get_searchsenior_body(data):
     body=d+s
     return body
 #组装0107body
-def get_0107body():
+def get_0107body(version):
     """
-    z终端类型（word）+制造商id（b5）+终端型号（b20）+终端id（b7）+sim卡iddid（bcd10）
+    终端类型（word）+制造商id（b5）+终端型号（b20）+终端id（b7）+sim卡iddid（bcd10）
     +终端硬件版本长度（b）+硬件版本号+终端固件版本长度（b）+固件版本号+GNSS模块（b）
     +通信模块（b）
     """
-    parm="0008"+"3131323334"+"3131323334313132333431313233343131323334"+\
-         "31313233343639"+"31313233343131323334"+"08312E382E352E3132"+\
-         "08312E382E352E3132"+"08"+"08"
+    if version==0:
+        parm = "0008" + "3131323334" + "3131323334313132333431313233343131323334" + \
+               "31313233343639"+"31313233343131323334"+"08312E382E352E3132"+"08312E382E352E3132"+"08"+"08"
+    elif version==1:
+        parm="0008"+"3130303030303131323334"+"313132333431313233343131323334313132333434343435353535353538"+\
+             "313132333431313233343131323334313132333434343435353535353538"+"31313233343131323334"+"08312E382E352E3132"+\
+             "08312E382E352E3132"+"08"+"08"
     return parm
 #通用应答
 # def Usual(link,mobile,id,answer_number,reno):

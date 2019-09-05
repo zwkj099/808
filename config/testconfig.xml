@@ -2,7 +2,7 @@
 <TestAutomatiomCfg>
 	<plublicparameters>
 	
-<!-- 		alarm：#报警状态
+<!-- 	alarm：#报警状态
 	    status：#状态
 	    jin：#经度
 	    wei：#纬度
@@ -26,7 +26,7 @@
 		<Key>ti=0</Key>
 		<Key>detester=2019-06-14 09:00:00</Key>
 		<Key>messageid=512</Key>
-		<Key>version=0</Key>
+		<Key>version=1</Key>
 
 	</plublicparameters>
 	
@@ -64,7 +64,8 @@
 			mel:附加信息－里程
 			oil:附加信息－油量
 			by:附加信息－信号强度
-			wn:附加信息－GNSS 定位卫星数 
+			wn:附加信息－GNSS 定位卫星数
+			temper：附加信息－车箱温度
 		-->
 		<Key>vedio_alarm=127</Key>	
 		<Key>vedio_signal=3</Key>
@@ -75,6 +76,7 @@
 		<Key>extra_speed=1</Key>
 		<Key>by=1</Key>		
 		<Key>wn=1</Key>
+        <Key>temper=32769</Key>
 					
 	</Extras808parameters>
 	

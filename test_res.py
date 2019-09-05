@@ -11,7 +11,6 @@ import reply
 from config import readconfig
 import db_operation
 from comman import buchuan, upload_location, reply_position
-from comman import Register_authentication_Heartbeat as Rah
 from auto_test import auto_test
 
 tp = testlibrary.testlibrary()
@@ -29,7 +28,7 @@ dbop = db_operation.db_operation()
 
 
 def test1(ip, port, mobile, deviceid, vnum, name, qualification):
-    #     print vnum
+
     ip = str(ip)
     port = str(port)
     mobile = str(mobile)
@@ -47,31 +46,29 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     2.idlist：外设及传感器附加信息
     3.wsid：主动安全报警附加信息
     """
-    extrainfo_id = [1]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
-    idlist = [65]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
-    wsid = [100]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
+    extrainfo_id = [1,6]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
+    idlist = [0]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
+    wsid = [0]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
     link = tp.tcp_link(ip, port)
     # 注册、鉴权、心跳
-    Rah.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
+    upload_location.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
 
     # 发送驾驶员信息
-    statu = 0
-    result = 0
-    institutions = "重庆市渝中区大坪"
-    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions)
+    statu = 1 #0x01：从业资格证 IC 卡插入（驾驶员上班）； 0x02：从业资格证 IC 卡拔出（驾驶员下班）
+    result = 0 #0x00：IC 卡读卡成功；0x01：读卡失败，原因为卡片密钥认证未通过；0x02：读卡失败，原因为卡片已被锁定； 0x03：读卡失败，原因为卡片被拔出； 0x04：读卡失败，原因为数据校验错误。
+    institutions = "重庆市渝中区大坪" #发证机构名称
+    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'])
     tp.send_data(link, drivers)
 
     # 数据库操作
     #     dbop.interface_db(tp,testlibrary)
     auto = 0;  # 是否要跑自动化脚本？
 
-    if (pdict['ti'] != 0):  # 补传数据
-        buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
-
-    elif auto == 1:  # 是否要跑自动化脚本？
+    if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
-
+    # elif (pdict['ti'] != 0):  # 补传数据
+    #     buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
     else:  # 正常上传位置信息
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
         res = tp.receive_data(link)
@@ -86,11 +83,23 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
         while True:
             if abs(int(time.strftime("%H%M%S", time.localtime())) - t) >= pdict['period']:
                 ex808dict['mel'] += 1
+                #info[1][4] +=1
                 sensordict['AD'] += 1
                 sensordict['Oil'] += 1
                 pdict['high'] += 1
                 pdict['jin'] += 0.001
                 pdict['wei'] += 0.001
+                sichuandict['event'] +=1
+                if(sichuandict['event']==9 ):
+                    sichuandict['event'] = 16
+                elif (sichuandict['event'] == 19):
+                    sichuandict['event'] = 1
+                    if(wsid[0]==100):
+                        wsid[0]=101
+                    elif (wsid[0] == 101):
+                        wsid[0] = 112
+                    elif(wsid[0]==112):
+                        wsid[0] = 100
                 info = readcig.build_data(pdict, sichuandict, ex808dict, sensordict, bluetoothdict, deviceid)
                 upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist,wsid)
                 res = tp.receive_data(link)
@@ -101,32 +110,39 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
                 for j in list:
                     # 根据下发报文判断需要响应内容
                     id = res[2:6]
-                    answer_number = res[22:26]
-                    reno = "01"
-
-                    if id in ["8201", "8202"]:
+                    # 应答流水号
+                    if pdict['version']==0:
+                        answer_number = res[22:26]
+                    elif pdict['version']==1:
+                        answer_number = res[32:36]
+                    reno = "00"
+                    if id in ["8201", "8202","8802","8500"]:
                         reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
 
                     else:
-                        reply.reply(link, i, mobile, id, answer_number)
+                        reply.reply(tp,link, i, mobile, id, answer_number, reno,pdict['version'])
 
                 t = int(time.strftime("%H%M%S", time.localtime()))
             else:
                 try:
-                    reno = "01"
+                    reno = "00"
                     res = tp.receive_data(link)
                     res = tp.dd(res)
                     id = res[2:6]
-                    answer_number = res[22:26]  # 应答流水号
+                    # 应答流水号
+                    if pdict['version']==0:
+                        answer_number = res[22:26]
+                    elif pdict['version']==1:
+                        answer_number = res[32:36]
                     # 切割响应
-                    # list=ano_res(res)
-                    if id in ["8201", "8202"]:
+                    #list=ano_res(res)
+                    if id in ["8201", "8202","8802","8500"]:
                         try:
                             reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
                         except Exception as e:
                             print e
                     else:
-                        reply.reply(link, res, mobile, id, answer_number, reno)
+                        reply.reply(tp,link, res, mobile, id, answer_number, reno,pdict['version'])
 
                 except:
                     pass
