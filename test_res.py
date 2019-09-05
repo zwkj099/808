@@ -156,15 +156,15 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "218.78.40.57"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.142"  # "111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6973  # 6994川标,6995冀标，6975部标
-deviceid =1040000
+port = 6995  # 6994川标,6995冀标，6975部标
+deviceid = 1040000
 mobile = 13100040000
 vnum = u"渝B40000"
 cont = 0
-name = "艾丽13"
-qualification = 14003529463400352905
+name = "艾丽11"
+qualification = 14003529463400352903
 thread_list = []
 for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification))
