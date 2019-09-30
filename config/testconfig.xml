@@ -15,8 +15,8 @@
 	    messageid: #区分单条位置512和批量位置1796
 	    version: #协议版本标识 version=0时表示2013版808协议，version=1时表示2019版808协议 -->
     
-		<Key>alarm=3</Key>
-		<Key>status=1</Key>
+		<Key>alarm=0</Key>
+		<Key>status=3</Key>
 		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
 		<Key>high=100</Key>
@@ -26,7 +26,7 @@
 		<Key>ti=0</Key>
 		<Key>detester=2019-06-14 09:00:00</Key>
 		<Key>messageid=512</Key>
-		<Key>version=1</Key>
+		<Key>version=0</Key>
 
 	</plublicparameters>
 	
@@ -43,11 +43,11 @@
 		    road_sign：#道路标志识别类型，取值0、1、2、3
 		    fatigue：#疲劳程度,取值0、1、2、3、4、5、6、7、8、9、10
      -->
-		<Key>zstatus=1</Key>
+		<Key>zstatus=2047</Key>
 		<Key>attach_Count=1</Key>
 		<Key>sign=1</Key>
 		<Key>event=1</Key>
-		<Key>level=1</Key>
+		<Key>level=2</Key>
 		<Key>deviate=1</Key>
 		<Key>road_sign=1</Key>
 		<Key>fatigue=1</Key>	
@@ -76,7 +76,7 @@
 		<Key>extra_speed=1</Key>
 		<Key>by=1</Key>		
 		<Key>wn=1</Key>
-        <Key>temper=32769</Key>
+        <Key>temper=32778</Key>
 					
 	</Extras808parameters>
 	
