@@ -22,9 +22,11 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
         info[1][4]= ex808dict['mel']
         info[0][8]= pdict['high']
         info[2] = oils
+        pdict['alarm']=2147483647
         pdict['messageid']=513
         upload_location.location(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number)
         pdict['messageid']=512
+        pdict['alarm']=0
     # 平台下发指令8202,跟踪
     elif id == "8202":
         nu = tp.to_int(res[26:30])  # 获取回传间隔时间
