@@ -35,7 +35,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             pass
         print "第%d次应答%s" % (x, reno)
         """
-        rlist = ["8103", "8106", "8107","8201", "8900", "8001"]
+        rlist = ["8103","8106", "8107","8201", "8900", "8001"]
         if id not in rlist:
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
@@ -44,7 +44,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
 
         # 平台下发指令8106，查询指定终端参数
         elif id == "8106":
-            search_body = get_loadres_body(res,answer_number,version)
+            search_body = get_loadres_body(tp,res,answer_number,version)
             search_head = tp.data_head(mobile, 260, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
             tp.send_data(link, search_data)
@@ -65,7 +65,8 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             tp.send_data(link, usual_redata)
             # 获取下发的透传类型
             if version==0:
-                typ = res[30:32]
+                typ = res[26:28]
+                print typ
                 sensor = res[34:36]
             elif version==1:
                 typ = res[36:38]
@@ -108,7 +109,7 @@ def get_usyal_body(id,ac,reno="00"):
     return body
 
 #组装读取指令应答body
-def get_loadres_body(data,answer_number,version):
+def get_loadres_body(tp,data,answer_number,version):
     #取得参数总数（可用于校验，未实现）
     total=data[26:28]
     #取得下发报文的流水号
@@ -160,7 +161,7 @@ def get_loadres_body(data,answer_number,version):
             da=id+"0400000001"
         x+=1
         parbody=parbody+da
-    resbody=ac+tp.to_hex(x,2)+parbody
+    resbody=ac+ tp.to_hex(x,2)+parbody
     return resbody
 
 
