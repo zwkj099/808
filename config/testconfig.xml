@@ -42,6 +42,13 @@
 		    deviate：#偏离类型，取值0、1、2
 		    road_sign：#道路标志识别类型，取值0、1、2、3
 		    fatigue：#疲劳程度,取值0、1、2、3、4、5、6、7、8、9、10
+		    tire_num ：胎压报警/事件列表总数，从1开始
+		    port： 协议对应端口
+        	tire_loc: 报警轮胎位置，从0开始
+        	tire_alarm_type：胎压报警/事件类型,2：胎压过高，4：胎压过低，8：胎温过高，16：传感器异常，32：胎压不平衡，64：慢漏气，128：电池电量低
+         	tire_pressure :胎压
+			tire_temp :胎温
+         	tire_electric:电池电量，取值从0-100
      -->
 		<Key>zstatus=2047</Key>
 		<Key>attach_Count=1</Key>
@@ -50,7 +57,11 @@
 		<Key>level=2</Key>
 		<Key>deviate=1</Key>
 		<Key>road_sign=1</Key>
-		<Key>fatigue=1</Key>	
+		<Key>fatigue=1</Key>
+		<Key>tire_num=3</Key>
+		<Key>tire_loc=1</Key>
+		<Key>tire_alarm_type=40</Key>
+
 	</sichuanparameters>
 	
 	<!-- 808附加信息相关参数 -->
