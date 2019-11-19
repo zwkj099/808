@@ -139,10 +139,10 @@ class mytool(object):
         :param returnr:返回主动安全报警数据
         '''
         ZDAQ_body = ""
-        sign, event, level, deviate, road_sign, fatigue,jin, wei, high, speed, zstatus, deviceid,attach_Count=zds
+        sign, event, level, deviate, road_sign, fatigue,jin, wei, high, speed, zstatus, deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type=zds
         for id in ids:
             if id in (100,101,102,103,112,113):
-                body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count)
+                body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type)
                 ZDAQ_body += body
             else:
                 print "无主动安全数据"
@@ -202,9 +202,10 @@ class mytool(object):
                 cont = cont + 1
         return self.add_f3_data(cont, data)
 
-    def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count):
+    def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count,port=6975,tire_num=0,tire_loc=0,tire_alarm_type=40,tire_pressure=3,tire_temp=35,tire_electric=50):
         ''' 川冀标主动安全数据
         :param id: 外设ID（100、101、102、103、112、113）
+        :param port:监控对象协议对应端口号
         :param sign:标志状态
         :param event:报警、事件类型
         :param level:报警级别
@@ -218,6 +219,12 @@ class mytool(object):
         :param zstatus:状态
         :param deviceid:报警中的终端ＩＤ字段
         :param attach_Count:报警中的附件数量
+        :param tire_num ：胎压报警/事件列表总数
+        :param tire_loc: 报警轮胎位置
+        :param tire_alarm_type：胎压报警/事件类型,2：胎压过高，4：胎压过低，8：胎温过高，16：传感器异常，32：胎压不平衡，64：慢漏气，128：电池电量低
+        :param tire_pressure :胎压
+        :param tire_temp :胎温
+        :param tire_electric:电池电量
         '''
         jin = float(jin) * 1000000
         wei = float(wei) * 1000000
@@ -226,6 +233,8 @@ class mytool(object):
         # ti = date.strftime("%y%m%d%H%M%S")
         alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(attach_Count, 2)+"00"
         data0=jctool.to_hex(speed, 2) + jctool.to_hex(high, 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(zstatus,4) + alarm
+        tire_alarm_info = jctool.to_hex(tire_num,2)+""
+
         # 驾驶辅助功能报警信息
         if id==100:
             data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2) + jctool.to_hex(speed, 2) + "09"+jctool.to_hex(deviate, 2) + jctool.to_hex(road_sign, 2)+"00" + data0
@@ -237,11 +246,18 @@ class mytool(object):
             data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ "0009" + "0008" + "0008"+ data0
         # 轮胎状态监测报警信息
         elif id==102:
-            data = "0000000100" + data0 + "00"
+            if port==6998: #浙标中盲区监测对应外设ID为66
+                data = "00000001" + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
+            else:
+                while tire_num>0:
+                    tire_alarm_info += jctool.to_hex(tire_loc, 2) + jctool.to_hex(tire_alarm_type,4) + jctool.to_hex(tire_pressure, 4) + jctool.to_hex(tire_temp, 4) + jctool.to_hex(tire_electric, 4)
+                    tire_loc += 1
+                    tire_num -= 1
+                data = "00000001" + jctool.to_hex(sign,2) + data0 + tire_alarm_info
 
         # 盲区监测报警信息
         elif id==103:
-            data = "000000010001" + data0
+            data = "00000001" + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
         # 卫星定位系统报警信息
         elif id==113:
             data = "000000010001000900" + data0
