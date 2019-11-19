@@ -10,8 +10,9 @@ import datetime
 import reply
 from config import readconfig
 import db_operation
-from comman import buchuan, upload_location, reply_position
+from comman import buchuan1, upload_location, reply_position
 from auto_test import auto_test
+
 
 tp = testlibrary.testlibrary()
 readcig = readconfig()
@@ -27,7 +28,7 @@ dbop = db_operation.db_operation()
 """
 
 
-def test1(ip, port, mobile, deviceid, vnum, name, qualification):
+def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
 
     ip = str(ip)
     port = str(port)
@@ -54,11 +55,17 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
     # 注册、鉴权、心跳
     upload_location.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
 
+    tal = int(tal)+30
+    date = datetime.datetime.strptime(pdict['detester'], "%Y-%m-%d %H:%M:%S")
+    time1 = (date + datetime.timedelta(seconds=int(tal))).strftime("%y%m%d%H%M%S")
+
     # 发送驾驶员信息
     statu = 1 #0x01：从业资格证 IC 卡插入（驾驶员上班）； 0x02：从业资格证 IC 卡拔出（驾驶员下班）
     result = 0 #0x00：IC 卡读卡成功；0x01：读卡失败，原因为卡片密钥认证未通过；0x02：读卡失败，原因为卡片已被锁定； 0x03：读卡失败，原因为卡片被拔出； 0x04：读卡失败，原因为数据校验错误。
     institutions = "重庆市渝中区大坪" #发证机构名称
-    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'])
+
+    ############     需要补传驾驶员信息，最后一个参数未time1,实时上传改为0或去掉 #############################
+    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'],time1)
     tp.send_data(link, drivers)
 
     # 数据库操作
@@ -67,13 +74,18 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification):
 
     if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
-    # elif (pdict['ti'] != 0):  # 补传数据
-    #     buchuan.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
+    elif (pdict['ti'] != 0):  # 补传数据
+        # excel_list=[]
+        wsid1 = []
+        pdict,zds,extrainfos,wsid1,excel_list_k=buchuan1.deal_data(pdict,zds,extrainfos,wsid1,i)#读取excel表格数据，改变速度、初始里程、报警事件
+        buchuan1.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid1,excel_list_k,tal)
+
     else:  # 正常上传位置信息
         upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
         res = tp.receive_data(link)
         print "上线成功，维持中"
         time.sleep(1)
+
 
     # 控制第x次通用应答响应
     x = 0
@@ -156,23 +168,26 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.142"  # "111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6995  # 6994川标,6995冀标，6975部标
-deviceid = 1040000
-mobile = 13100040000
-vnum = u"渝B40000"
+port = 6994  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标
+deviceid =2019101101 #20190928
+mobile =11910110001 #123456789
+vnum = u"桂11"  #桂BB001
 cont = 0
-name = "艾丽11"
-qualification = 14003529463400352903
+name = "B3-1"
+qualification = 14303529463400355003
+
+tal=0
 thread_list = []
-for i in range(0, 1):
-    t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification))
+for i in range(0, 4):
+    t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
     t.start()
     deviceid += 1
     mobile += 1
     qualification += 1
     cont += 1
+    tal += 3600
     # vnum=vnum+str(random.randint(1,100))
     name = name + str(cont)
     thread_list.append(t)

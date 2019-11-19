@@ -121,7 +121,7 @@ class mytool(object):
         else:
             print "消息ID有误，请输入位置消息ID 512或1796"
 
-    def zd_body(self,ids=None, zds=None):
+    def zd_body(self,ids=None, zds=None,ti=0):
         '''组装主动安全附加信息
         :param ids: 外设ID,可以同时传入多个（100、101、102、103、112、113）
         :param sign:标志状态
@@ -345,7 +345,7 @@ class mytool(object):
         data = self.add_all(hhead)
         return data
 
-    def driver_information(self,mobile,statu,result,name,qualification,institutions,version=0):
+    def driver_information(self,mobile,statu,result,name,qualification,institutions,version=0,ti=0):
         """组装驾驶员信息采集上报0702
         :param mobile:手机号
         :param statu:状态
@@ -356,7 +356,10 @@ class mytool(object):
         :param version:协议版本，１表示808-2019，０表示808-2013
         :return:返回组装后的驾驶员信息
         """
-        ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
+        if ti==0:
+            ti = time.strftime("%y%m%d%H%M%S", time.localtime()) #插卡/拔卡时间
+        else:
+            ti=ti
         dnlength=len(jctool.character_string(name))/2 #驾驶员姓名长度
         znlength =len(jctool.character_string(institutions))/2 #发证机构名称长度
         dbody0 = jctool.to_hex(statu, 2) + str(ti)#拔卡上传信息

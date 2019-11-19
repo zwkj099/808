@@ -23,10 +23,10 @@
 		<Key>speed=80</Key>
 		<Key>direction=100</Key>
 		<Key>period=30</Key>
-		<Key>ti=0</Key>
-		<Key>detester=2019-06-14 09:00:00</Key>
+		<Key>ti=1</Key>
+		<Key>detester=2019-09-8 08:00:00</Key>
 		<Key>messageid=512</Key>
-		<Key>version=1</Key>
+		<Key>version=0</Key>
 
 	</plublicparameters>
 	
