@@ -66,7 +66,6 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             # 获取下发的透传类型
             if version==0:
                 typ = res[26:28]
-                print typ
                 sensor = res[34:36]
             elif version==1:
                 typ = res[36:38]
@@ -99,7 +98,84 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
                     usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
                     result = tp.add_all(usual_head + usual_body)
                     tp.send_data(link, result)
-
+         #短信平台私有协议，文本下发
+        # elif id=="8300":
+        #     tag = res[61:66] #获取下发的标识，确认下发的内容是什么，在进行对应应答
+        #     #回应通用应答
+        #     usual_body = get_usyal_body(id, answer_number, reno)
+        #     usual_head = tp.data_head(mobile, 1, usual_body, 5, version)
+        #     usual_redata = tp.add_all(usual_head + usual_body)
+        #     tp.send_data(link, usual_redata)
+        #     #判断应答内容,回应对应回应
+        #     sim="#simID:13627667666*ID:7667666GPS:A*CSQ:20*CGR:1*VER:F200A-V2.5.5"
+        #     if tag=="S10":
+        #         usual_body =tag +"* ABCDEF"+sim
+        #     elif tag=="F10":
+        #         usual_body =tag+"*ABCDEF"
+        #     elif tag=="S11":
+        #         usual_body = tag+"*IP1*112.126.64.32*6975"+sim
+        #     elif tag=="F11":
+        #         usual_body = tag + "*IP1*112.126.64.32*6975"+sim
+        #     elif tag=="S12":
+        #         usual_body = tag + "*APN"+sim
+        #     elif tag=="F12":
+        #         pass
+        #     elif tag=="S13":
+        #         usual_body = tag + "*13627667666 * 7667666"+sim
+        #     elif tag=="F13":
+        #         pass
+        #     elif tag=="S14":
+        #         pass
+        #     elif tag=="S15":
+        #         pass
+        #     elif tag=="S16":
+        #         usual_body = tag + "*文件名;用户名;密码;IP地址;端口;路径"+sim
+        #     elif tag=="S17":
+        #         usual_body = tag + "*模式*参数" + sim
+        #     elif tag=="F17":
+        #         pass
+        #     elif tag=="S18":
+        #         usual_body = tag + "*休眠模式*是否上报位置信息*位置上报间隔*心跳上报间隔" + sim
+        #     elif tag=="F18":
+        #         pass
+        #     elif tag=="S19":
+        #         usual_body = tag + "*0#"
+        #     elif tag=="F19":
+        #         pass
+        #     elif tag=="S20":
+        #         usual_body = tag + "*IP1*112.126.64.32*端口号*SIM卡号*设备ID*车牌颜色" + sim
+        #     elif tag=="F20":
+        #         pass
+        #     elif tag=="S21":
+        #         usual_body = tag + "*车牌号*车牌颜色*VIN码" + sim
+        #     elif tag=="F21":
+        #         pass
+        #     elif tag=="S22":
+        #         usual_body = tag + "*总里程" + sim
+        #     elif tag=="S23":
+        #         usual_body = tag + "*电压值" + sim
+        #     elif tag=="F23":
+        #         pass
+        #     elif tag=="S24":
+        #         usual_body = tag + "*定位模式" + sim
+        #     elif tag=="F24":
+        #         pass
+        #     elif tag=="S25":
+        #         usual_body = tag + "*模式*阈值1*阈值2*阈值3" + sim
+        #     elif tag=="F25":
+        #         pass
+        #     elif tag=="S26":
+        #         usual_body = tag + "*距离阈值" + sim
+        #     elif tag=="F26":
+        #         pass
+        #     #回应对应回应
+        #     No="IP1"#从下发的内容中解析出来，IP1或IP2
+        #     IP="112.126.64.32"#从下发的内容中解析出来
+        #     port="6975"#从下发的内容中解析出来
+        #     usual_body = "F50101" + "S11*"+No+"*"+IP+"*"+port+"#simID:13627667666*ID:7667666*GPS:A*CSQ:20*CGR:1*VER:F200A-V2.5.5" #设置上级平台
+        #     usual_head = tp.data_head(mobile, 2304, usual_body, 5, version)
+        #     result = tp.add_all(usual_head + usual_body)
+        #     tp.send_data(link, result)
 
     except:
         pass
@@ -148,7 +224,7 @@ def get_loadres_body(tp,data,answer_number,version):
         elif id == "0000F906":
             da=id+"070A000102030000000000000A00010203000000000000"
         elif id == "0000F641":
-            da=id+"150000003A000000010000007500000005000000B00000000A000000EA0000001000000124000000160000015F0000001D0000019A00000023000001D40000002B0000020E00000032000002490000003A0000028300000042000002BE0000004A000002F80000005100000333000000580000036E00000060000003A800000066000003E30000006B0000041D0000007000000458000000750000049200000078FFFFFFFFFFFFFFFF247E"
+            da=id+"75000000CA0000005B00000194000000B70000025E00000112000003280000016D000003F2000001C9000004BC00000224000005860000027F00000650000002DA0000071A00000336000007E400000391000008AE000003EC000009780000044800000A42000004A300000B0C000004FE00000BD60000055A00000CA0000005B500000D6A0000061000000E340000066C00000EFE000006C700000FC800000722FFFFFFFFFFFFFFFF247E"
         elif id in list1:
             da=id+"0474657374"
         elif id in list2:
