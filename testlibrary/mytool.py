@@ -148,7 +148,7 @@ class mytool(object):
                 print "无主动安全数据"
         return ZDAQ_body
 
-    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,lys=None):
+    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,lys=None):
         '''组装F3附加信息，目前只实现了油量
                     :param ids: 传感器ID，十进制数
                     :param Oils:油量相关参数，包含 AD值,oil加油量,high液位高度
@@ -200,7 +200,45 @@ class mytool(object):
                 fs, zt, ztime, bd, sj = gss
                 data += self.add_gs(i, fs, zt, ztime, bd, sj)
                 cont = cont + 1
+        ## 处理基站和wifi数据
+        if ids.__contains__(8)==True and ids.__contains__(9)==False:
+            #组装基站
+            basever, report_frequency, position_mode, time_num, start_time, info_status, info_groupnum, mcc, sid, lac_nid, cell_bid, bcch, bsic, dbm, c1, c2, txp, rla, tch, ta, rxq_sub, rxq_full=base
+            data += self.add_base(8,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full)
+            cont +=1
+        elif ids.__contains__(8)==True and ids.__contains__(9)==True:
+            #组装基站和wifi
+            basever, report_frequency, position_mode, time_num, start_time, info_status, info_groupnum, mcc, sid, lac_nid, cell_bid, bcch, bsic, dbm, c1, c2, txp, rla, tch, ta, rxq_sub, rxq_full=base
+            data += self.add_base(8,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full)
+            cont +=1
+
+            ver,softver,electric,csq,groupnum,mac,wifi_sign = wifi
+            data += self.add_wifi(9,ver,softver,electric,csq,groupnum,mac,wifi_sign)
+            cont += 1
         return self.add_f3_data(cont, data)
+
+    def add_base(self,id,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full):
+        data = jctool.to_hex(id, 2) + "24" + jctool.to_hex(basever, 2) + jctool.to_hex(report_frequency,8) + jctool.to_hex(position_mode, 2) + \
+               jctool.to_hex(time_num, 2) + str(int(start_time)) + jctool.to_hex(info_status, 2) + jctool.to_hex(info_groupnum, 2) + \
+               jctool.to_hex(mcc, 4) + jctool.to_hex(sid, 4) + jctool.to_hex(lac_nid, 4) + jctool.to_hex(cell_bid, 4) + jctool.to_hex(bcch, 4) + \
+               jctool.to_hex(bsic, 4) + jctool.to_hex(dbm, 2) + jctool.to_hex(c1, 4) + jctool.to_hex(c2,4) + jctool.to_hex(txp, 2) + \
+               jctool.to_hex(rla, 2) + jctool.to_hex(tch, 4) + jctool.to_hex(ta, 2) + jctool.to_hex(rxq_sub,2) + jctool.to_hex(rxq_full, 2)
+        print data
+        return data
+    
+    def add_wifi(self,id,ver,softver,electric,csq,groupnum,mac,wifi_sign):
+        # 13代表数据长度，16进制
+        mac ='010082400000'
+        wifi_sign =0
+        csq = 31
+        data = jctool.to_hex(id, 2) + "13" + jctool.to_hex(ver, 2) + jctool.to_hex(softver,16) + jctool.to_hex(electric, 2) + \
+               jctool.to_hex(csq, 2) + jctool.to_hex(groupnum, 2) + str(mac) + jctool.to_hex(wifi_sign, 2)
+
+        #     data=hexcovert.to_hex(id,2)+"0C"+hexcovert.to_hex(ver,2)+hexcovert.to_hex(softver,16)+hexcovert.to_hex(electric,2)+\
+        #          hexcovert.to_hex(csq,2)+hexcovert.to_hex(grouopnum,2)
+        print mac
+        print data
+        return data
 
     def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count,port=6975,tire_num=0,tire_loc=0,tire_alarm_type=40,tire_pressure=3,tire_temp=35,tire_electric=50):
         ''' 川冀标主动安全数据

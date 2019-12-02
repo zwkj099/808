@@ -37,9 +37,9 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
 
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
     # 组装数据
-    zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys = readcig.build_data(pdict, sichuandict, ex808dict,sensordict, bluetoothdict,deviceid)
+    zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs,base,wifi, lys = readcig.build_data(pdict, sichuandict, ex808dict,sensordict, bluetoothdict,deviceid)
 
-    info = [zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys]
+    info = [zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs,base,wifi, lys]
 
     """
     需要上传的附加信息或基于0200的扩展信息；十进制数，0或不填写表示不上传对应附加信息
@@ -47,8 +47,10 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     2.idlist：外设及传感器附加信息
     3.wsid：主动安全报警附加信息
     """
-    extrainfo_id = [1,6]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
-    idlist = [0]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时
+    extrainfo_id = [1,48,49]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
+
+   #上传wifi数据时，必须同时上传基站数据，上传基站数据，0200状态要为未定位
+    idlist = [8,9]  # [34, 39, 65,69,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时；8：基站数据；8、9：wifi数据
     wsid = [0]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
     link = tp.tcp_link(ip, port)
@@ -65,7 +67,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     institutions = "重庆市渝中区大坪" #发证机构名称
 
     ############     需要补传驾驶员信息，最后一个参数未time1,实时上传改为0或去掉 #############################
-    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'],time1)
+    drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'],0)
     tp.send_data(link, drivers)
 
     # 数据库操作
@@ -171,17 +173,17 @@ def ano_res(res):
 # 设置接入ip
 ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6994  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标
-deviceid =2019101101 #20190928
-mobile =11910110001 #123456789
-vnum = u"桂11"  #桂BB001
+port = 6975  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标
+deviceid =3211111 #20190928
+mobile =18617900006 #123456789
+vnum = u"test123"  #桂BB001
 cont = 0
 name = "B3-1"
 qualification = 14303529463400355003
 
 tal=0
 thread_list = []
-for i in range(0, 4):
+for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
     t.start()
     deviceid += 1

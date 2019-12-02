@@ -83,11 +83,10 @@ class read_configfile(object):
                 bluetoothdict[keyb] = int(valueb)
             else:
                 bluetoothdict[keyb] = valueb
-                
-             
+
         return [publicdict,sichuandict,ex808dict,sensordict,bluetoothdict]
     
-    def build_data(self,pdict,sichuandict,ex808dict,sensordict,bluetoothdict,deviceid,port):
+    def build_data(self,pdict,sichuandict,ex808dict,sensordict,bluetoothdict,deviceid,port=6975):
         # 川冀标主动安全参数
         zds=[sichuandict['sign'],sichuandict['event'],sichuandict['level'],sichuandict['deviate'],sichuandict['road_sign'],sichuandict['fatigue'],\
              pdict['jin'], pdict['wei'],pdict['high'],pdict['speed'],sichuandict['zstatus'],deviceid,sichuandict['attach_Count'],port,sichuandict['tire_num'],sichuandict['tire_loc'],sichuandict['tire_alarm_type']]
@@ -107,7 +106,13 @@ class read_configfile(object):
         
         gss = [sensordict['fs'],sensordict['zt'],sensordict['ztime'],sensordict['bd'],sensordict['sj']]#工时传感器参数
         lcs = [sensordict['mel'],sensordict['speed']]#里程传感器参数
+        base =[sensordict['basever'],sensordict['report_frequency'],sensordict['position_mode'],sensordict['time_num'],sensordict['start_time'],sensordict['info_status'], \
+               sensordict['info_groupnum'],sensordict['mcc'],sensordict['sid'],sensordict['lac_nid'],sensordict['cell_bid'],sensordict['bcch'],sensordict['bsic'],sensordict['dbm'], \
+               sensordict['c1'],sensordict['c2'],sensordict['txp'],sensordict['rla'],sensordict['tch'],sensordict['ta'],sensordict['rxq_sub'],sensordict['rxq_full']]
+
+        wifi =[sensordict['ver'],sensordict['softver'],sensordict['electric'],sensordict['csq'],sensordict['groupnum'],sensordict['mac'],sensordict['wifi_sign']]
     
         lys=[bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery']] #蓝牙信标数据
 
-        return [zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,lys]
+
+        return [zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,base,wifi,lys]

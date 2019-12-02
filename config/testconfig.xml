@@ -16,14 +16,14 @@
 	    version: #协议版本标识 version=0时表示2013版808协议，version=1时表示2019版808协议 -->
     
 		<Key>alarm=0</Key>
-		<Key>status=3</Key>
+		<Key>status=3</Key> <!-- 上传基站数据时，需要是未定位-->
 		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
 		<Key>high=100</Key>
 		<Key>speed=80</Key>
 		<Key>direction=100</Key>
 		<Key>period=30</Key>
-		<Key>ti=1</Key>
+		<Key>ti=0</Key>
 		<Key>detester=2019-09-8 08:00:00</Key>
 		<Key>messageid=512</Key>
 		<Key>version=0</Key>
@@ -85,8 +85,8 @@
 		<Key>mel=1000</Key>
 		<Key>oil=1</Key>
 		<Key>extra_speed=1</Key>
-		<Key>by=1</Key>		
-		<Key>wn=1</Key>
+		<Key>by=5</Key>
+		<Key>wn=6</Key>
         <Key>temper=32778</Key>
 					
 	</Extras808parameters>
@@ -179,6 +179,75 @@
     		-->
 		<Key>mel=100</Key>	
 		<Key>speed=10</Key>
+
+		<!--基站数据
+		 	basever:参数版本号
+		 	report_frequency:上报频率
+		 	position_mode:定位模式
+		 	time_num:定点时间个数
+		 	start_time:定点时间/上报起始时间点  时分 hhmmss，BCD 码
+		 	info_status:定位信息状态
+		 	info_groupnum:基站信息组数
+		 	mcc:mcc,移动国家码；默认为 460（中国）；不够位数前面补 0
+		 	sid:mnc 或 sid,移动基站定位,移动网络码；移动为 00 00；联通为 00 01
+
+		 	- - -lac_nid,cell_bid决定了基站的经纬度
+		 	lac_nid:lac对应移动基站定位的位置区号码,nid对应电信基站定位
+		 	cell_bid:cell_id,对应移动基站定位的小区号 bid,对应电信基站定位
+
+		 	bcch:信道的绝对无线频道编号
+		 	bsic: 基站识别码
+		 	dbm:以 dbm 为单位的接收信号等级，无负号
+		 	C1:C1值，送她回去
+		 	C2:C2值
+		 	txp:访问一个 CCH 信道时的最大发射功率等
+		 	rla:允许访问系统的最小接收信号等级
+		 	tch:TCH 信道的绝对无线频道编号
+		 	ta:时间提前量
+		 	rxq_sub:接收质量(sub),范围是 0-7
+		 	rxq_full:接收质量(full),范围是 0-7-->
+		<!-- 上传基站定位，0200状态位需要是未定位,但是目前上传未定位142是心跳状态，而定位时正常-->
+
+		<Key>basever=0</Key>
+		<Key>report_frequency=0</Key>
+		<Key>position_mode=1</Key>
+		<Key>time_num=1</Key>
+		<Key>start_time=160000</Key>
+		<Key>info_status=1</Key>
+		<Key>info_groupnum=1</Key>
+		<Key>mcc=460</Key>
+		<Key>sid=0</Key>
+		<Key>lac_nid=6324</Key>
+		<Key>cell_bid=33427</Key>
+		<Key>bcch=59</Key>
+		<Key>bsic=45</Key>
+		<Key>dbm=8</Key>
+		<Key>c1=173</Key>
+		<Key>c2=613</Key>
+		<Key>txp=5</Key>
+		<Key>rla=8</Key>
+		<Key>tch=0</Key>
+		<Key>ta=0</Key>
+		<Key>rxq_sub=0</Key>
+		<Key>rxq_full=0</Key>
+
+		<!--wifi数据
+		 	ver:参数版本
+		 	softver:终端软件版本
+		 	electric:电量 例：0x60,转成十进制为 96，即电量为 96%
+		 	csq:0~31,未检测到时为 99
+		 	mac:MAC地址,BCD 码
+		 	wifi_sign:信号强度以 dbm 为单位的信号强度，无负号-->
+		<!-- 上传wifi定位，基站 info_status:定位信息状态第5位必须为0
+			groupnum要大于等于1-->
+		<Key>ver=0</Key>
+		<Key>softver=10</Key>
+		<Key>electric=95</Key>
+		<Key>csq=20</Key>
+		<Key>groupnum=1</Key>
+		<Key>mac=408D5CC2191F</Key>
+		<Key>wifi_sign=31</Key>
+
 										
 	</sensorparameters>
 

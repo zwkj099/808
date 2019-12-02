@@ -5,7 +5,7 @@
 		<Value>./TestLib</Value>
 	</KeyValues>
 	<TestList>
-		<Test>polling_test</Test>
+		<!--Test>polling_test</Test-->
 		<Test>load_test</Test>
 		<Test>oil_test</Test>
 		<Test>oilwear_test</Test>
