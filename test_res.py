@@ -88,7 +88,6 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
         print "上线成功，维持中"
         time.sleep(1)
 
-    print "ok"
 
     # 控制第x次通用应答响应
     x = 0
