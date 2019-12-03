@@ -35,7 +35,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             pass
         print "第%d次应答%s" % (x, reno)
         """
-        rlist = ["8103","8106", "8107","8201", "8900", "8001"]
+        rlist = ["8104","8103","8106", "8107","8201", "8900", "8001"]
         if id not in rlist:
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
@@ -48,7 +48,12 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             search_head = tp.data_head(mobile, 260, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
             tp.send_data(link, search_data)
-
+        # 平台下发指令8104，查询全部终端参数
+        elif id == "8104":
+            search_body = answer_number+"1A00000001040000003C0000001005434D4E455400000011000000001200000000130C3131332E3230342E352E3538000000180400001B3F0000002004000000000000002704000000140000002904000000140000002C040000006400000030040000000F00000055040000006400000056040000000A0000005704000038400000005904000004B00000005B0200320000005C0207080000005E02001E0000008004000000000000008102002C0000008202012F0000008308D4C14238363636360000008401010000009001030000F44F380000000000000000000002000014006E000000000000000000000000000000000000000000000000000000000000000000000000000000000000F4503800000000000000000000001432320A0000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+            search_head = tp.data_head(mobile, 260, search_body, 5,version)
+            search_data = tp.add_all(search_head + search_body)
+            tp.send_data(link, search_data)
         # 平台下发指令8107，查询终端属性
         elif id == "8107":
             search2_body = get_0107body(version)
@@ -80,19 +85,21 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             tp.send_data(link, result)
         # 平台下发指令8103，传感器参数设置
         elif id == "8103":
+            #先应答通用应答
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)
             tp.send_data(link, usual_redata)
-            if version==0:
-                if tp.to_int(res[28:34]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+            # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900；根据版本确认是按2013-808格式应答，还是按2019-808格式应答
+            if version==0:#2013-808格式
+                if tp.to_int(res[28:34]) == 243:
                     sensor = res[34:36]
                     usual_body = "F301" + sensor + "03" + answer_number + reno
                     usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
                     result = tp.add_all(usual_head + usual_body)
                     tp.send_data(link, result)
-            elif version==1:
-                if tp.to_int(res[38:44]) == 243:  # 获取设置的ID，如果是带F3的ID，则通用应答后需要继续应答0900
+            elif version==1:#2019-808格式
+                if tp.to_int(res[38:44]) == 243:
                     sensor = res[44:46]
                     usual_body = "F301" + sensor + "03" + answer_number + reno
                     usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
@@ -223,8 +230,13 @@ def get_loadres_body(tp,data,answer_number,version):
             da=id+"0A01000201030204030600"
         elif id == "0000F906":
             da=id+"070A000102030000000000000A00010203000000000000"
-        elif id == "0000F641":
+        elif id == "0000F641":#油量标定数组
             da=id+"75000000CA0000005B00000194000000B70000025E00000112000003280000016D000003F2000001C9000004BC00000224000005860000027F00000650000002DA0000071A00000336000007E400000391000008AE000003EC000009780000044800000A42000004A300000B0C000004FE00000BD60000055A00000CA0000005B500000D6A0000061000000E340000066C00000EFE000006C700000FC800000722FFFFFFFFFFFFFFFF247E"
+        # 高精度硬件参数读取0X4F0和x50，按0X4F0和x50设置的协议格式上传
+        elif id == "0000F450" or id =="0000F44F":
+            da0 = "0000F44F" + "38000000000000000000000000"+"101020203030"+"0000000000000000000000000000000000000000000000000000000000000000000000000000"
+            da1="0000F450" + "15000000000000000000000000"+"323232"+"000000000000"
+            da=da0+da1
         elif id in list1:
             da=id+"0474657374"
         elif id in list2:
