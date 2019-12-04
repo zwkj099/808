@@ -181,7 +181,7 @@ class mytool(object):
                 data += self.add_yh(i, oilsp, oiltemp, tio, times)
                 cont = cont + 1
             elif i == 79:  # 4Ｆ电量检测
-                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity = zdjc
+                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity = dljc
                 data += self.add_dljc(i, data_id,alarm_id,electric,traffic_volume,refrigerated_capacity)
                 cont = cont + 1
             elif i == 80:  # 终端信息检测
