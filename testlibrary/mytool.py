@@ -148,8 +148,8 @@ class mytool(object):
                 print "无主动安全数据"
         return ZDAQ_body
 
-    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,lys=None):
-        '''组装F3附加信息，目前只实现了油量
+    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,zdjc=None,lys=None):
+        '''组装F3附加信息
                     :param ids: 传感器ID，十进制数
                     :param Oils:油量相关参数，包含 AD值,oil加油量,high液位高度
                     :param wds: 温度相关参数
@@ -162,7 +162,7 @@ class mytool(object):
                     :param return:返回F3附加信息
                     '''
         data = ""
-        cont = 0
+        cont = 0#用来计算上传的传感器个数
         for i in ids:
             if i in (33,34,35,36,37):# 温度
                 sign, temp, times, warn = wds
@@ -179,6 +179,14 @@ class mytool(object):
             elif i in (69,70):# 油耗
                 oilsp, oiltemp, tio, times = yhs
                 data += self.add_yh(i, oilsp, oiltemp, tio, times)
+                cont = cont + 1
+            elif i == 79:  # 4Ｆ电量检测
+                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity = zdjc
+                data += self.add_dljc(i, data_id,alarm_id,electric,traffic_volume,refrigerated_capacity)
+                cont = cont + 1
+            elif i == 80:  # 终端信息检测
+                alarm_id, vehicle_status = zdjc
+                data += self.add_zdjc(i,alarm_id,vehicle_status, 0, 0)
                 cont = cont + 1
             elif i == 81:  # 正反转
                 sign, zt, fx, xs, times, li, xtimes = zfs
@@ -576,6 +584,37 @@ class mytool(object):
         times=float(times)*10
         data=jctool.to_hex(id,2)+"10"+jctool.to_hex(oilsp,8)+jctool.to_hex(oiltemp,8)+jctool.to_hex(tio,8)+\
             jctool.to_hex(times,8)
+        return data
+
+    def add_zdjc(self,id,alarm_id,vehicle_status,tio,times):
+        '''
+        获取终端及车辆信息检测报文
+        :param id: 终端信息检测id（0Ｘ50，对应80）
+        :param alarm_id:报警标识
+        :param vehicle_status:车辆状态
+        :param tio:
+        :param times:
+        :return:终端及车辆信息检测报文
+        '''
+        data0=jctool.to_hex(alarm_id,4)+"00000111"+"00"+"00"+jctool.to_hex(vehicle_status,4)+"0011"+"0001000100010002"+"000000000000"
+        size = len(data0) / 2
+        data = jctool.to_hex(id, 2) +jctool.to_hex(size,2)+data0
+        return data
+
+    def add_dljc(self,id,data_id,alarm_id,terminal_power,traffic_volume,refrigerated_capacity):
+        '''
+        获取电量检测报文
+        :param id: 终端信息检测id（0Ｘ4Ｆ，对应79）
+        :param data_id:数据标识
+        :param alarm_id:报警标识
+        :param terminal_power:电量
+        :param traffic_volume:行车电量
+        :param refrigerated_capacity:冷藏电量
+        :return:电量检测检测报文
+        '''
+        data0=jctool.to_hex(data_id,2)+jctool.to_hex(alarm_id,2)+jctool.to_hex(terminal_power,4)+jctool.to_hex(traffic_volume,4)+jctool.to_hex(refrigerated_capacity,4)+"00"+"00"+"0011"
+        size = len(data0) / 2
+        data = jctool.to_hex(id, 2) +jctool.to_hex(size,2)+data0
         return data
 
     def add_zf(self,id,sign,zt,fx,xs,times,li,xtimes):
