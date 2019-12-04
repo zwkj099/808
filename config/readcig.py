@@ -87,7 +87,7 @@ class read_configfile(object):
         return [publicdict,sichuandict,ex808dict,sensordict,bluetoothdict]
     
     def build_data(self,pdict,sichuandict,ex808dict,sensordict,bluetoothdict,deviceid,port=6975):
-        # 川冀标主动安全参数
+        # 各省份标准主动安全参数
         zds=[sichuandict['sign'],sichuandict['event'],sichuandict['level'],sichuandict['deviate'],sichuandict['road_sign'],sichuandict['fatigue'],\
              pdict['jin'], pdict['wei'],pdict['high'],pdict['speed'],sichuandict['zstatus'],deviceid,sichuandict['attach_Count'],port,sichuandict['tire_num'],sichuandict['tire_loc'],sichuandict['tire_alarm_type']]
     
@@ -95,7 +95,7 @@ class read_configfile(object):
         extrainfos=[ex808dict['vedio_alarm'], ex808dict['vedio_signal'], ex808dict['memery'], ex808dict['abnormal_driving'],\
                     ex808dict['mel'], ex808dict['oil'], ex808dict['extra_speed'], ex808dict['by'], ex808dict['wn'],ex808dict['temper']]
     
-        #外设传感器相关参数
+        #Ｆ3扩展协议附加信息：外设传感器相关参数
         oils=[sensordict['AD'],sensordict['Oil'],pdict['high'],sensordict['addoil']]#油量传感器参数
         wds = [sensordict['sign'],sensordict['temp'],sensordict['times'],sensordict['warn']]#温度传感器参数
         sds = [sensordict['sign'],sensordict['hum'],sensordict['times'],sensordict['warn']]#湿度传感器参数
@@ -111,8 +111,9 @@ class read_configfile(object):
                sensordict['c1'],sensordict['c2'],sensordict['txp'],sensordict['rla'],sensordict['tch'],sensordict['ta'],sensordict['rxq_sub'],sensordict['rxq_full']]
 
         wifi =[sensordict['ver'],sensordict['softver'],sensordict['electric'],sensordict['csq'],sensordict['groupnum'],sensordict['mac'],sensordict['wifi_sign']]
-    
+        zdjc=[sensordict['alarm_id'],sensordict['vehicle_status']]#终端信息监测数据
+        dljc=[sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],sensordict['traffic_volume'],sensordict['refrigerated_capacity']]
         lys=[bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery']] #蓝牙信标数据
 
 
-        return [zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,base,wifi,lys]
+        return [zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,base,wifi,zdjc,dljc,lys]
