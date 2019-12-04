@@ -91,7 +91,7 @@
 					
 	</Extras808parameters>
 	
-	<!--# 传感器参数-->	
+	<!--# Ｆ3协议扩展附加信息、传感器参数-->
 	<sensorparameters>
 		<!--油量传感器参数
 		    AD：#AD 值
@@ -247,6 +247,26 @@
 		<Key>groupnum=1</Key>
 		<Key>mac=408D5CC2191F</Key>
 		<Key>wifi_sign=31</Key>
+
+		<!-- zdjc终端信息检测－－Ｆ３高精度终端
+		    alarm_id=127#报警标识，127表示低６位都为1
+    		vehicle_status=3#车辆状态
+    		-->
+		<Key>alarm_id=127</Key>
+		<Key>vehicle_status=3</Key>
+
+		<!-- dljc电量检测－－Ｆ３高精度终端
+		     data_id:数据标识
+             alarm_id:报警标识
+             terminal_power:电量
+             traffic_volume:行车电量
+             refrigerated_capacity:冷藏电量
+    		-->
+		<Key>data_id=127</Key>
+		<Key>alarm_id=3</Key>
+		<Key>terminal_power=127</Key>
+		<Key>traffic_volume=3</Key>
+		<Key>refrigerated_capacity=3</Key>
 
 										
 	</sensorparameters>
