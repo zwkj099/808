@@ -148,7 +148,7 @@ class mytool(object):
                 print "无主动安全数据"
         return ZDAQ_body
 
-    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,zdjc=None,lys=None):
+    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,zdjc=None,dljc=None,lys=None):
         '''组装F3附加信息
                     :param ids: 传感器ID，十进制数
                     :param Oils:油量相关参数，包含 AD值,oil加油量,high液位高度
