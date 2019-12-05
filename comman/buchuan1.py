@@ -8,8 +8,8 @@ import datetime
 import time
 from comman.autoupload import readexcel
 
-def upload(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,excellist,tal=0):
-    zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,lys = info
+def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,excellist,tal=0):
+    oils,wds,sds,yhs,zfs,zzs,gss,lcs,lys = info
     date = datetime.datetime.strptime(pdict['detester'], "%Y-%m-%d %H:%M:%S")
     # date1 =datetime.datetime.strptime((date + datetime.timedelta(seconds=int(tal))).strftime("%y%m%d%H%M%S"), "%Y-%m-%d %H:%M:%S")
     date =date + datetime.timedelta(seconds=int(tal))
@@ -37,8 +37,8 @@ def upload(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,ws
     print "循环次数： "+ str(cycle_index)
     for j in range(0,cycle_index):
 
-        sensordict['AD'] += 1
-        sensordict['Oil'] += 1
+        info[0][0] += 1  # 增加油量传感器ＡＤ值
+        info[0][1] += 1  # 增加油量传感器油量值
         pdict['high'] += 1
         pdict['jin'] +=0.001
         pdict['wei'] +=0.001
