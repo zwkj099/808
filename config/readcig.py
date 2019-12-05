@@ -88,7 +88,7 @@ class read_configfile(object):
 
         info = [oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys]
 
-        return [publicdict,extrainfos,sichuandict,sensordict,info,zds,extrainfos]
+        return [publicdict,sichuandict,sensordict,info,zds,extrainfos]
     
     def build_data(self,pdict,sichuandict,ex808dict,sensordict,bluetoothdict,deviceid,port=6975):
         # 各省份标准主动安全参数
