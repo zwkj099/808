@@ -116,7 +116,7 @@ class read_configfile(object):
 
         wifi =[sensordict['ver'],sensordict['softver'],sensordict['electric'],sensordict['csq'],sensordict['groupnum'],sensordict['mac'],sensordict['wifi_sign']]
         zdjc=[sensordict['alarm_id'],sensordict['vehicle_status']]#终端信息监测数据
-        dljc=[sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],sensordict['traffic_volume'],sensordict['refrigerated_capacity']]
+        dljc=[sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],sensordict['traffic_volume'],sensordict['refrigerated_capacity'],sensordict['communication_type'],sensordict['operator']]
         lys=[bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery']] #蓝牙信标数据
 
 
