@@ -13,18 +13,13 @@ def reply_pos(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,
     
     # 平台下发指令8201，位置信息查询
     if id == "8201":
-        # 组装0201位置数据，包含油量数据、里程数据
-        # ex808dict['mel'] += 1#增加里程
-        # sensordict['AD'] += 1#增加ＡＤ值
-        # sensordict['Oil'] += 1#增加油量值
-        # pdict['high'] += 1#增加油量高度
-        # oils = [ sensordict['AD'], sensordict['Oil'], pdict['high'],sensordict['addoil']]
-
-        #info[0][8]= pdict['high']
-        #info[2] = oils
+        info[0][0] += 1  # 增加油量传感器－ＡＤ值
+        info[0][1] += 1  # 增加油量传感器－油量
+        info[0][2] += 1  # 增加油量传感器－高度
+        extrainfos[4] += 1  # 增加－里程
         pdict['alarm']=2147483647
         pdict['messageid']=513
-        upload_location.location(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number)
+        upload_location.location(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number)# 组装0201位置数据，包含油量数据、里程数据
         pdict['messageid']=512
         pdict['alarm']=0
     # 平台下发指令8202,跟踪
