@@ -36,6 +36,9 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     deviceid = str(deviceid)
 
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict,info,zds, extrainfos = readcig.readtestfile(deviceid)#读取testconfig.xml变更，并组装成需要的列表变量
+    #pdict0200基础信息；sichuandict：四川主动安全附加信息；ex808dict：808附加信息；sensordict：传感器附加信息； bluetoothdict：附加信息； info：附加信息； zds主动安全附加信息； extrainfos
+    # print ex808dict.key
+    # print sensordict
 
     """
     需要上传的附加信息或基于0200的扩展信息；十进制数，0或不填写表示不上传对应附加信息
@@ -79,7 +82,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
         buchuan1.upload(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid1,excel_list_k,tal)
 
     else:  # 正常上传位置信息
-        upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid)
+        upload_location.location(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id, idlist, wsid)
         res = tp.receive_data(link)
         print "上线成功，维持中"
         time.sleep(1)
@@ -110,7 +113,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                         wsid[0] = 112
                     elif(wsid[0]==112):
                         wsid[0] = 100
-                upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist,wsid)
+                upload_location.location(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id, idlist,wsid)
                 res = tp.receive_data(link)
                 res = tp.dd(res)
                 # 切割响应
@@ -126,8 +129,8 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                         answer_number = res[32:36]
                     reno = "00"
                     if id in ["8201", "8202","8802","8500"]:#位置信息相关的应答指令
-                        reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
-
+                        #reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
+                        reply_position.reply_pos(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id, idlist,wsid, answer_number, res, id, reno)
                     else:#除位置信息外的应答指令
                         reply.reply(tp,link, i, mobile, id, answer_number, reno,pdict['version'])
 
@@ -147,7 +150,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                     #list=ano_res(res)
                     if id in ["8201", "8202","8802","8500"]:
                         try:
-                            reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
+                            reply_position.reply_pos(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
                         except Exception as e:
                             print e
                     else:
