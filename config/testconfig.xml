@@ -261,12 +261,16 @@
              terminal_power:电量
              traffic_volume:行车电量
              refrigerated_capacity:冷藏电量
+             communication_type：前面一个是通讯类型；
+             operator：运营商
     		-->
 		<Key>data_id=127</Key>
 		<Key>alarm_id=3</Key>
 		<Key>terminal_power=127</Key>
 		<Key>traffic_volume=3</Key>
 		<Key>refrigerated_capacity=3</Key>
+        <Key>communication_type=3</Key>
+		<Key>operator=3</Key>
 
 										
 	</sensorparameters>
