@@ -86,7 +86,7 @@ class read_configfile(object):
 
         zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys = self.build_data(publicdict, sichuandict, ex808dict, sensordict, bluetoothdict, deviceid)
 
-        info = [zds, extrainfos, oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys]
+        info = [oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys]
 
         return [publicdict,sichuandict,ex808dict,sensordict,bluetoothdict,info,zds, extrainfos]
     
