@@ -148,7 +148,7 @@ class mytool(object):
                 print "无主动安全数据"
         return ZDAQ_body
 
-    def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,zdjc=None,dljc=None,lys=None):
+    def f3_attach(self,ids=None,info=None):
         '''组装F3附加信息
                     :param ids: 传感器ID，十进制数
                     :param Oils:油量相关参数，包含 AD值,oil加油量,high液位高度
@@ -161,6 +161,7 @@ class mytool(object):
                     :param lcs: 里程相关参数
                     :param return:返回F3附加信息
                     '''
+        oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys = info
         data = ""
         cont = 0#用来计算上传的传感器个数
         for i in ids:
