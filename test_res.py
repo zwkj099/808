@@ -36,7 +36,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     deviceid = str(deviceid)
 
     pdict, sichuandict, sensordict, info,zds, extrainfos = readcig.readtestfile(deviceid)#读取testconfig.xml变更，并组装成需要的列表变量
-    #pdict:0200基础信息；sichuandict：四川主动安全附加信息；sensordict：传感器附加信息； info：传感器组装后的附加信息； zds：组装后的主动安全附加信息； extrainfos：组装后的808附加信息
+    #pdict:0200基础信息；sichuandict：四川主动安全附加信息；sensordict：传感器附加信息； info：F3扩展协议组装后的附加信息； zds：组装后的主动安全附加信息； extrainfos：组装后的808附加信息
     # print ex808dict.key
 
     """
