@@ -7,24 +7,24 @@ Created on 2019年8月19日
 import upload_location
 import time
 
-def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number,res,id,reno):
+def reply_pos(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number,res,id,reno):
     
 #     zds,extrainfos,oils,wds,sds,yhs,zfs,zzs,gss,lcs,lys = info
     
     # 平台下发指令8201，位置信息查询
     if id == "8201":
         # 组装0201位置数据，包含油量数据、里程数据
-        ex808dict['mel'] += 1
-        sensordict['AD'] += 1
-        sensordict['Oil'] += 1
-        pdict['high'] += 1
-        oils = [ sensordict['AD'], sensordict['Oil'], pdict['high'],sensordict['addoil']]
-        info[1][4]= ex808dict['mel']
-        info[0][8]= pdict['high']
-        info[2] = oils
+        # ex808dict['mel'] += 1#增加里程
+        # sensordict['AD'] += 1#增加ＡＤ值
+        # sensordict['Oil'] += 1#增加油量值
+        # pdict['high'] += 1#增加油量高度
+        # oils = [ sensordict['AD'], sensordict['Oil'], pdict['high'],sensordict['addoil']]
+
+        #info[0][8]= pdict['high']
+        #info[2] = oils
         pdict['alarm']=2147483647
         pdict['messageid']=513
-        upload_location.location(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number)
+        upload_location.location(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number)
         pdict['messageid']=512
         pdict['alarm']=0
     # 平台下发指令8202,跟踪
@@ -45,15 +45,15 @@ def reply_pos(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist
         while i < tim / nu:
             # 组装0200位置数据，包含油量数据、里程数据
             tp.send_data(link, usual_redata)
-            upload_location.location(tp,link,mobile,pdict,ex808dict,sensordict,info,extrainfo_id,idlist,wsid,answer_number)
+            upload_location.location(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number)
             time.sleep(nu)
             i += 1
             print "第%d次发送跟踪信息：" % i
     elif id == "8802":#存储多媒体数据检索
         pdict['messageid'] = 2050
-        upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
+        upload_location.location(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id, idlist, wsid,answer_number)
         pdict['messageid'] = 512
     elif id == "8500":#终端控制－加解锁
         pdict['messageid'] = 1280
-        upload_location.location(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id, idlist, wsid,answer_number)
+        upload_location.location(tp, link, mobile, pdict, extrainfos,zds, info, extrainfo_id, idlist, wsid,answer_number)
         pdict['messageid'] = 512
