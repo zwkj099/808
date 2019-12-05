@@ -182,8 +182,8 @@ class mytool(object):
                 data += self.add_yh(i, oilsp, oiltemp, tio, times)
                 cont = cont + 1
             elif i == 79:  # 4Ｆ电量检测
-                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity = dljc
-                data += self.add_dljc(i, data_id,alarm_id,electric,traffic_volume,refrigerated_capacity)
+                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity,communication_type, operator = dljc
+                data += self.add_dljc(i, data_id,alarm_id,electric,traffic_volume,refrigerated_capacity,communication_type, operator)
                 cont = cont + 1
             elif i == 80:  # 终端信息检测
                 alarm_id, vehicle_status = zdjc
@@ -602,7 +602,7 @@ class mytool(object):
         data = jctool.to_hex(id, 2) +jctool.to_hex(size,2)+data0
         return data
 
-    def add_dljc(self,id,data_id,alarm_id,terminal_power,traffic_volume,refrigerated_capacity):
+    def add_dljc(self,id,data_id,alarm_id,terminal_power,traffic_volume,refrigerated_capacity,communication_type, operator):
         '''
         获取电量检测报文
         :param id: 终端信息检测id（0Ｘ4Ｆ，对应79）
@@ -613,7 +613,7 @@ class mytool(object):
         :param refrigerated_capacity:冷藏电量
         :return:电量检测检测报文
         '''
-        data0=jctool.to_hex(data_id,2)+jctool.to_hex(alarm_id,2)+jctool.to_hex(terminal_power,4)+jctool.to_hex(traffic_volume,4)+jctool.to_hex(refrigerated_capacity,4)+"00"+"00"+"0011"
+        data0=jctool.to_hex(data_id,2)+jctool.to_hex(alarm_id,2)+jctool.to_hex(terminal_power,4)+jctool.to_hex(traffic_volume,4)+jctool.to_hex(refrigerated_capacity,4)+jctool.to_hex(communication_type,2)+jctool.to_hex(operator,2)+"0011"
         size = len(data0) / 2
         data = jctool.to_hex(id, 2) +jctool.to_hex(size,2)+data0
         return data
