@@ -8,8 +8,7 @@ import datetime
 import time
 from comman.autoupload import readexcel
 
-def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,excellist,tal=0):
-    oils,wds,sds,yhs,zfs,zzs,gss,lcs,lys = info
+def upload(tp,link,mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdict,extrainfo_id,idlist,wsid,excellist,deviceid,port=6975,tal=0,answer_number=0000):
     date = datetime.datetime.strptime(pdict['detester'], "%Y-%m-%d %H:%M:%S")
     # date1 =datetime.datetime.strptime((date + datetime.timedelta(seconds=int(tal))).strftime("%y%m%d%H%M%S"), "%Y-%m-%d %H:%M:%S")
     date =date + datetime.timedelta(seconds=int(tal))
@@ -19,7 +18,7 @@ def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,exc
     num = int(excellist[5])+1
     alarm_num = int(excellist[2])
     #主动安全数据
-    zds[1]=excellist[1]  #事件
+    sichuandict['event']=excellist[1]  #事件
 
     cycle_index = 0
     if num > alarm_num:
@@ -37,19 +36,19 @@ def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,exc
     print "循环次数： "+ str(cycle_index)
     for j in range(0,cycle_index):
 
-        info[0][0] += 1  # 增加油量传感器ＡＤ值
-        info[0][1] += 1  # 增加油量传感器油量值
+        sensordict['AD'] += 1  # 增加油量传感器ＡＤ值
+        sensordict['Oil'] += 1  # 增加油量传感器油量值
         pdict['high'] += 1
         pdict['jin'] +=0.001
         pdict['wei'] +=0.001
 
         #如果报警事件需要改变
         if excellist[-2]=='yes':
-            zds[1]+=1
-            if ( zds[1] == 9):
-                zds[1] = 16
-            elif ( zds[1] == 19):
-                zds[1] = 1
+            sichuandict['event']+=1
+            if ( sichuandict['event'] == 9):
+                sichuandict['event'] = 16
+            elif ( sichuandict['event'] == 19):
+                sichuandict['event'] = 1
 
         #如果速度需要改变
         if excellist[-1]=='yes' and pdict['speed']<120:
@@ -62,9 +61,12 @@ def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,exc
             wsid=[0]
         print "报警："
         print wsid
-        gpsdata = tp.position(mobile, pdict['messageid'], 2, 0, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'], pdict['high'], \
-                              pdict['speed'], timelist[j], pdict['direction'],tp.extra_info(extrainfo_id, extrainfos), tp.zd_body(wsid, zds,timelist[j]),\
-                              tp.f3_attach(idlist, oils, wds, sds, yhs, zfs, zzs, gss, lcs, lys), pdict['version'])
+        gpsdata = tp.position(mobile, pdict['messageid'], 6, 1, pdict['alarm'], pdict['status'], pdict['jin'],
+                              pdict['wei'], \
+                              pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
+                              tp.extra_info(extrainfo_id, ex808dict),
+                              tp.zd_body(wsid, pdict, sichuandict, deviceid, port),
+                              tp.f3_attach(idlist, pdict, sensordict, bluetoothdict), pdict['version'], answer_number)
 
         gpshead = tp.data_head(mobile, pdict['messageid'], gpsdata, 3, pdict['version'])
         gpsdata = tp.add_all(gpshead + gpsdata)
@@ -74,11 +76,11 @@ def upload(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,exc
         #如果循环次数小于等于里程需要增加的次数，里程每次加1，否则里程保持不变
         if (j+1) <num:
             print "里程："
-            print extrainfos[4]
-            extrainfos[4] += 1
+            print ex808dict['mel']
+            ex808dict['mel'] += 1
         time.sleep(3)
 
-def deal_data(pdict,zds,extrainfos,wsid1,i):
+def deal_data(pdict, sichuandict, ex808dict, sensordict,bluetoothdict,wsid1,i):
     for k in range(i, i + 1):
         excel_list = readexcel()
         if str(excel_list[k][0]).find('|') != -1:
@@ -88,11 +90,11 @@ def deal_data(pdict,zds,extrainfos,wsid1,i):
                 wsid1.append(int(m))
         else:
             wsid1.append(int(excel_list[k][0]))
-        zds[1] = int(excel_list[k][1])
+            sichuandict['event'] = int(excel_list[k][1])
         pdict['speed'] = int(excel_list[k][3])
-        extrainfos[4] = excel_list[k][4]
+        ex808dict['mel'] = excel_list[k][4]
 
-    return [pdict,zds,extrainfos,wsid1,excel_list[k]]
+    return [wsid1,excel_list[k]]
 
 
 

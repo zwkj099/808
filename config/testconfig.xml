@@ -82,7 +82,7 @@
 		<Key>vedio_signal=3</Key>
 		<Key>memery=2</Key>
 		<Key>abnormal_driving=4</Key>	
-		<Key>mel=1000</Key>
+		<Key>mel=100</Key>
 		<Key>oil=1</Key>
 		<Key>extra_speed=1</Key>
 		<Key>by=5</Key>
@@ -98,10 +98,14 @@
     		Oil：#液体量,总油量
     		addoil：#加油量
     	-->
+		<Key>oil_sign=0</Key>
 		<Key>AD=30</Key>
-		<Key>Oil=20</Key>
+		<Key>liquid_temp=310</Key>
+		<Key>env_temp=300</Key>
 		<Key>addoil=0</Key>
-		
+		<Key>spilloil=0</Key>
+		<Key>Oil=20</Key>
+
 		<!--温度传感器参数
 		    sign:#重要数据标识，Bit7：0 普通数据；1:重要数据；车载终端检测为重要数据时，则马上组包上报平台。顺时针、逆时针、停转三种状态转换时，则为重要数据；Bit0-6:保留 补零
     		temp:#温度值，0.1 开氏温度
@@ -128,13 +132,13 @@
 		<Key>tio=0</Key>	
 		
 		<!--正反转传感器参数
-		    zt:#旋转状态，01-停转；02-运行
+		    zts:#旋转状态，01-停转；02-运行
 		    fx:#旋转方向，01-顺时针旋转；02-逆时针旋转
 		    xs:#旋转速度，单位：转/分钟
 		    li:#累计脉冲数量，旋转的总脉冲数量；
 		    xtimes:#旋转方向持续时间，单位：分钟
     	-->
-		<Key>zt=0</Key>
+		<Key>zts=0</Key>
 		<Key>fx=0</Key>
 		<Key>xs=0</Key>
 		<Key>li=0</Key>			
@@ -149,15 +153,18 @@
 		    ad1: 载重相对值，AD 值：范围 0x00～0xFFFF；
 		    ad2: 原始 AD 值，AD 值
 		    ad3: 浮动零点，AD 值
+		    datalen:数据长度，当长度不为18，载重传感器异常
     	-->
-		<Key>dw=2</Key>
-		<Key>zt=6</Key>
-		<Key>cs=1</Key>
-		<Key>zl=1</Key>
-		<Key>zzzl=10</Key>
-		<Key>ad1=50</Key>
-		<Key>ad2=60</Key>
-		<Key>ad3=70</Key>
+
+		<Key>dw=0</Key>
+		<Key>zt=0</Key>
+		<Key>cs=0</Key>
+		<Key>zl=0</Key>
+		<Key>zzzl=0</Key>
+		<Key>ad1=0</Key>
+		<Key>ad2=0</Key>
+		<Key>ad3=0</Key>
+		<Key>datalen=18</Key>
 		
 		<!--工时传感器参数
 		    fs: 工时检测方式，0x00：电压比较式；0x01：油耗阈值式；0x02：油耗波动式0x03-0xFFFF：保留
@@ -168,11 +175,13 @@
 		    sj: 检测数据,工时检测方式为 0 时，数据为电压值，单位 0.1V；范围0-65535；工时检测方式为 1 时，数据为流量值，单位 0.01 升/时，
 		    		取值范围，0～65535；工时检测方式为 2 时，数据为流量值，单位 0.01 升/时，取值范围，0～65535；
     	-->
-		<Key>fs=0</Key>	
-		<Key>ztime=0</Key>
+		<Key>fs=0</Key>
+		<Key>ztt=0</Key>
+		<Key>ztime=2</Key>
 		<Key>bd=0</Key>			
 		<Key>sj=0</Key>
-		
+		<Key>gslen=0C</Key>
+
 		<!-- 里程传感器
 		    mel=100#累积里程
     		speed=10#车速,Km/h 
@@ -272,7 +281,7 @@
         <Key>communication_type=3</Key>
 		<Key>operator=3</Key>
 
-										
+
 	</sensorparameters>
 
 	<!--蓝牙信标数据-->	

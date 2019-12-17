@@ -18,6 +18,8 @@ class jctool(object):
         '''
         s = str(hex(int(str_10)))   #转换为16进制
         s = s[2:]  #去掉0x
+        if s[-1:].find("L")!=-1:#如果是长整型，去掉负号L
+            s=s[:-1]
         while len(s) < num:  #不足位数前面补0
             s = "0" + s
         if  len(s) > num:
@@ -152,6 +154,7 @@ class jctool(object):
 
     # 生成校验码，转化7d7e，添加包头包尾
     def add_all(self, datastr):
+
         po = str(datastr)
         add = int(po[0:2], 16)
         po = po[2:]
