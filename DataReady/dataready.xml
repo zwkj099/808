@@ -5,17 +5,18 @@
 		<Value>./DataReady/datamodule</Value>
 	</KeyValues>
 	<TestList>
-		<!--<Test>alarm_report</Test>-->
-		<!--<Test>position_report</Test>-->
-		<Test>sensor_report</Test>
-		<Test>bubiao_report</Test>
-		<Test>sichuan_report</Test><!-- 必须不能是客车-->
+		<Test>alarm_report</Test>
+		<Test>position_report</Test>
+		<!--<Test>sensor_report</Test>-->
+		<!--<Test>bubiao_report</Test>-->
+		<!--<Test>sichuan_report</Test>&lt;!&ndash; 必须不能是客车&ndash;&gt;-->
  		<!--<Test>sichuan_report_2</Test>&lt;!&ndash; 必须是客车&ndash;&gt;-->
-		<Test>shanxi_report_pilao</Test>
-		<Test>shanxi_report_overspeed</Test>
-		<Test>shanxi_report_piaoyi</Test>
-		<Test>shanxi_report_yidong</Test>
-		<Test>shanxi_report_yichang</Test>
-		<Test>puhuo_report</Test>
+		<!--<Test>sichuan_report_Vehicleposition</Test>-->
+		<!--<Test>shanxi_report_pilao</Test>-->
+		<!--<Test>shanxi_report_overspeed</Test>-->
+		<!--<Test>shanxi_report_piaoyi</Test>-->
+		<!--<Test>shanxi_report_yidong</Test>-->
+		<!--<Test>shanxi_report_yichang</Test>-->
+		<!--<Test>puhuo_report</Test>-->
 	</TestList>
 </TEST_CONFIG>

@@ -20,7 +20,7 @@
 		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
 		<Key>high=100</Key>
-		<Key>speed=80</Key>
+		<Key>speed=30</Key>
 		<Key>direction=100</Key>
 		<Key>period=30</Key>
 		<Key>ti=0</Key>
@@ -82,7 +82,7 @@
 		<Key>vedio_signal=3</Key>
 		<Key>memery=2</Key>
 		<Key>abnormal_driving=4</Key>	
-		<Key>mel=100</Key>
+		<Key>mel=101</Key>
 		<Key>oil=1</Key>
 		<Key>extra_speed=1</Key>
 		<Key>by=5</Key>

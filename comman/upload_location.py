@@ -5,16 +5,47 @@ Created on 2019年8月19日
 @author: admin
 '''
 import time
-# def location(tp,link,mobile,pdict,extrainfos,zds,info,extrainfo_id,idlist,wsid,answer_number=0000):
 def location(tp, link, mobile,pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid,deviceid,port, answer_number=0000):
 
-    gpsdata = tp.position(mobile, pdict['messageid'], 6, 1, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
+    ########## 第三个参数说明要上传的位置条数,第四个为位置数据类型 ：0：正常位置批量汇报，1：盲区补报##########
+    gpsdata = tp.position(mobile, pdict['messageid'], 40, 1, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
                           pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
                           tp.extra_info(extrainfo_id,ex808dict),tp.zd_body(wsid,pdict,sichuandict,deviceid,port),tp.f3_attach(idlist,pdict,sensordict,bluetoothdict), pdict['version'],answer_number)
-    gpshead = tp.data_head(mobile, pdict['messageid'], gpsdata, 3, pdict['version'])
-    gpsdata = tp.add_all(gpshead + gpsdata)
-    tp.send_data(link, gpsdata)
+    # print "location.gpsdata:"
+    # print gpsdata
 
+    ###########  分包：针对0704批量上传位置信息 ############
+    '''
+    消息最多发送长度为1024个字节，即2048个字符
+    标识位+消息头+校验码+标识位 长度为38字符
+    消息体最长只能为2048-38=2010字符,故消息体大于2010需要分包
+    '''
+    gpsbody =[]
+    if int(pdict['messageid'])==1796 and len(gpsdata)>2010:
+        if len(gpsdata)%2010==0:
+            count = (len(gpsdata)/2010)
+        else:
+            count = (len(gpsdata)/2010)+1
+        for j in range(0,count):
+            if len(gpsdata)>2010:
+                gpsbody.append(gpsdata[:2010])
+                gpsdata=gpsdata[2010:]
+            else:
+                gpsbody.append(gpsdata)
+
+    if gpsbody!=[]:
+        print "需要分包："
+        for i in range(len(gpsbody)):
+            gpshead = tp.data_head(mobile, pdict['messageid'],gpsbody[i] ,3,pdict['version'],i,count)##将第几个分包、分包总数传给消息头
+            gpsdata1 = tp.add_all(gpshead + gpsbody[i])
+            print "分包："+str(i+1)
+            tp.send_data(link, gpsdata1)
+
+    ##########不分包 ###############
+    else:
+        gpshead = tp.data_head(mobile, pdict['messageid'], gpsdata, 3, pdict['version'])
+        gpsdata = tp.add_all(gpshead + gpsdata)
+        tp.send_data(link, gpsdata)
 
 def initial(tp, link, deviceid, vnum, mobile, version):
     # 注册

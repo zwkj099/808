@@ -25,7 +25,7 @@ class mytool(object):
         pass
 
     # 组装head头，传入参数包括手机号，消息id，消息体，流水号（可不传，默认0000）
-    def data_head(self, mobile, newid, data, xulie=1,version=0):
+    def data_head(self, mobile, newid, data, xulie=1,version=0,num1=0,totalpack=0):
         '''
         组装消息头
         :param mobile: 手机号
@@ -33,17 +33,34 @@ class mytool(object):
         :param data:消息体，包括基本信息，附加信息，f3信息
         :param xulie:消息流水号，默认0000
         :param version:协议版本，１表示808-2019，０表示808-2013
+        :param num1:第几个分包
+        :param totalpack:分包总数
         :return:对应消息id的消息头信息
+
         '''
         lenth = len(data) / 2
+        num = num1+1
         if version==0:
             while len(mobile) < 12:
                 mobile = "0" + mobile
-            head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+            if totalpack==0:
+                head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+            else:##如果分包数不为0
+                lenth = lenth + 8192  # 加上分包位的值
+                head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie,4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         elif version==1:
             while len(mobile) < 20:
                 mobile = "0" + mobile
             head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
+
+        # elif version==2: ##先假设分包总数为2
+        #     while len(mobile) < 12:
+        #         mobile = "0" + mobile
+        #     lenth = lenth+8192 #加上分包位的值
+        #     # print newid,lenth,mobile,xulie,num
+        #
+        #     head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)+jctool.to_hex(totalpack, 4)+jctool.to_hex(num, 4)
+
         return head
     # 组装报文body，传入ascii码的设备号和车牌号
     def data_zc_body(self, deviceid, vnum,version):

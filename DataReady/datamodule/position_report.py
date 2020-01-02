@@ -74,7 +74,7 @@ def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port
                     sensordict['oilsp'] += 1
                     pdict['speed'] = 3
                     ex808dict['mel'] += 1
-                elif k > 70 and k < 80:  # 行驶
+                elif k > 70 and k < 100:  # 行驶
                     if k == 71:
                         pdict['speed'] = 30
                     sensordict['tio'] += 10
