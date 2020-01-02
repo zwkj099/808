@@ -53,14 +53,6 @@ class mytool(object):
                 mobile = "0" + mobile
             head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
 
-        # elif version==2: ##先假设分包总数为2
-        #     while len(mobile) < 12:
-        #         mobile = "0" + mobile
-        #     lenth = lenth+8192 #加上分包位的值
-        #     # print newid,lenth,mobile,xulie,num
-        #
-        #     head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)+jctool.to_hex(totalpack, 4)+jctool.to_hex(num, 4)
-
         return head
     # 组装报文body，传入ascii码的设备号和车牌号
     def data_zc_body(self, deviceid, vnum,version):
