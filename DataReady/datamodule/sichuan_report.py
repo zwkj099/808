@@ -6,7 +6,7 @@ import re
 import datetime
 import reply
 from config import readconfig
-from comman import upload_location, reply_position
+from comman import upload_location, reply_position,setMileage
 readcig = readconfig()
 tp = testlibrary.testlibrary()
 
@@ -17,8 +17,10 @@ tp = testlibrary.testlibrary()
    下面上传的是持续超速报警
 
 """
-def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port):
+def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id):
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
+    # 设置redis里程，传入车辆id，公共参数pdict
+    setMileage.setto_redismel(vehicle_id, ex808dict, pdict['redishost'], pdict['db'], pdict['pwd'])
     datalist = readexcel()
 
     setspeed = datalist[0][1]

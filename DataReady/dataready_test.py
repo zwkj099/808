@@ -45,10 +45,11 @@ def dynamicimport(__funclist):
         raise TAException.taexception(4,"import module error:\n"+err.message,"TEST_AUTOMATION_ERROR")
     return __func
 
-def datatest(tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port):
+def datatest(tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id):
 
     __funclist,__argslist,testinfo=readtestfile()
     __func=dynamicimport(__funclist)
 
     for test in range(len(__func)):
-        __func[test].main(__argslist[test], testinfo, tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port)
+        __func[test].main(__argslist[test], testinfo, tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id)
+

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import xlrd
-from comman import upload_location, reply_position
+from comman import upload_location, reply_position,setMileage
 from config import readconfig
+
 readcig = readconfig()
 
 """
@@ -10,8 +11,12 @@ readcig = readconfig()
 2.设置传感器相关报警，上传前需要设置idlist = [传感器id...] 
 """
 
-def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port):
+def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id):
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()  #每次都有testconfig中的初始值，不带上一个模块设置的值过来
+
+    # 设置redis里程，传入车辆id，公共参数pdict
+    setMileage.setto_redismel(vehicle_id, ex808dict, pdict['redishost'], pdict['db'], pdict['pwd'])
+
     excel_list = readexcel()
     alarmstatus =0
 

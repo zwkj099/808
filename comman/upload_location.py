@@ -8,12 +8,11 @@ import time
 def location(tp, link, mobile,pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid,deviceid,port, answer_number=0000):
 
     ########## 第三个参数说明要上传的位置条数,第四个为位置数据类型 ：0：正常位置批量汇报，1：盲区补报##########
-    gpsdata = tp.position(mobile, pdict['messageid'], 40, 1, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
+    gpsdata = tp.position(mobile, pdict['messageid'], 2, 0, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
                           pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
                           tp.extra_info(extrainfo_id,ex808dict),tp.zd_body(wsid,pdict,sichuandict,deviceid,port),tp.f3_attach(idlist,pdict,sensordict,bluetoothdict), pdict['version'],answer_number)
     # print "location.gpsdata:"
     # print gpsdata
-
     ###########  分包：针对0704批量上传位置信息 ############
     '''
     消息最多发送长度为1024个字节，即2048个字符

@@ -16,6 +16,7 @@ def Usual(link,mobile,id,answer_number,reno):
            :param answer_number: 应答流水号
            :param reno:应答结果
            '''
+
     usual_body = get_usyal_body(id, answer_number, reno)
     usual_head = tp.data_head(mobile, 1, usual_body, 5)
     result = tp.add_all(usual_head + usual_body)

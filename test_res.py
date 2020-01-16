@@ -10,7 +10,7 @@ import datetime
 import reply
 from config import readconfig
 import db_operation
-from comman import buchuan1, upload_location, reply_position
+from comman import buchuan1, upload_location, reply_position,setMileage
 from auto_test import auto_test
 from DataReady import dataready_test
 
@@ -44,10 +44,10 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     2.idlist：外设及传感器附加信息
     3.wsid：主动安全报警附加信息
     """
-    extrainfo_id = [1]#[1,48,49]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
+    extrainfo_id = [1,48,49]#[1,48,49]  # [1,2,3,20,21,22,23,24,48,49]#传入需要组装的附件信息ID,不传表示无附加信息;1：里程，2：油量，3：速度，48：信号强度，49：卫星颗数，20：视频相关报警，21：视频信号丢失报警状态，22：视频信号遮挡报警状态，23：存储器故障报警状态，24：异常驾驶行为报警详细描述
 
    #上传wifi数据时，必须同时上传基站数据，上传基站数据，0200状态要为未定位
-    idlist = []  # [34, 39, 65,69,79,80,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；79:电量检测,80:终端检测；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时；8：基站数据；8、9：wifi数据
+    idlist = [65,69]  # [34, 39, 65,69,79,80,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；79:电量检测,80:终端检测；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时；8：基站数据；8、9：wifi数据
     wsid = [0]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
     link = tp.tcp_link(ip, port)
@@ -67,10 +67,17 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     drivers = tp.driver_information(mobile, statu, result, name, qualification, institutions,pdict['version'],0)
     tp.send_data(link, drivers)
 
+
+    #设置redis里程，传入车辆id，公共参数ex808dict
+    vehicle_id = '17aef77b-f9f9-42d9-a96c-60ffb2902a4d'
+    setMileage.setto_redismel(vehicle_id,ex808dict,pdict['redishost'],pdict['db'],pdict['pwd'])
+    print "redis mel: "+str(ex808dict['mel'])
+
+
     # 数据库操作
     #     dbop.interface_db(tp,testlibrary)
     auto = 0;  # 是否要跑自动化脚本？
-    aa=1
+    aa=0
     if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
     elif (pdict['ti'] != 0):  # 补传数据
@@ -78,8 +85,9 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
         wsid1,excel_list_k=buchuan1.deal_data(pdict, sichuandict, ex808dict, sensordict,bluetoothdict,wsid1,i)#读取excel表格数据，改变速度、初始里程、报警事件
         buchuan1.upload(tp, link, mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid1,excel_list_k,deviceid,port,tal)
 
-    elif aa==0:  #数据准备，也要根据情况设置extrainfo_id,idlist ,wsid，该绑定传感器的要到平台绑定传感器
-        dataready_test.datatest(tp, link, mobile, extrainfo_id, idlist, wsid,deviceid,port)
+    elif aa==1:  #数据准备，也要根据情况设置extrainfo_id,idlist ,wsid，该绑定传感器的要到平台绑定传感器
+        print "数据准备开始"
+        dataready_test.datatest(tp, link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id)
         print "准备数据完成"
 
     else:  # 正常上传位置信息
@@ -87,6 +95,8 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
         res = tp.receive_data(link)
         print "上线成功，维持中"
         time.sleep(1)
+
+    print "ok"
 
     # 控制第x次通用应答响应
     x = 0
@@ -179,7 +189,7 @@ deviceid =4561238 #20190928
 mobile =12233650127 #123456789
 vnum = u"桂A0002"  #桂BB001
 cont = 0
-name = "驾驶员渝A0001"
+name = "驾驶员桂A0002"
 qualification = 14303529463400355011
 
 tal=0

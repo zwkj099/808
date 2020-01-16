@@ -6,7 +6,7 @@ import re
 import datetime
 import reply
 from config import readconfig
-from comman import upload_location, reply_position
+from comman import upload_location, reply_position,setMileage
 readcig = readconfig()
 tp = testlibrary.testlibrary()
 
@@ -14,8 +14,10 @@ tp = testlibrary.testlibrary()
    传感器报表：除了I/O报表、胎压报表、OBD行程报表、油量里程报表（上面跑完会有数据）、F3高精度报表
 
 """
-def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port):
+def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id):
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
+    # 设置redis里程，传入车辆id，公共参数pdict
+    setMileage.setto_redismel(vehicle_id, ex808dict, pdict['redishost'], pdict['db'], pdict['pwd'])
     datalist = readexcel()
     keylist =[]
     start_value=[]
