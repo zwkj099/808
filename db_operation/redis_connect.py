@@ -16,5 +16,7 @@ class RedisConnect(object):
         else:
             return None
 
+    def getkeys(self):
+        return self.rdb.keys()
 
 
