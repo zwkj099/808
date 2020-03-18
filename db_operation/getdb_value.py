@@ -4,7 +4,6 @@ import json
 
 def getredis(key,host,db,pwd):
     rdb = RedisConnect(host,db,pwd)
-    key = key+'-location'
     value=rdb.get(key)
     if value!=None:
         result=json.loads(value)#将unicode转为字典
@@ -12,4 +11,4 @@ def getredis(key,host,db,pwd):
         return None
     return result
 
-
+#*-vehiclestatus
