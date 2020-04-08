@@ -78,6 +78,27 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             # 透传类型为Ｆ３协议时，组装应答数据
             if typ=="F6":
                 usual_body = "F301" + sensor + "03" + answer_number + reno
+            elif typ =="F7":#上传基本信息、状态查询
+                work_state="04" #工作状态
+                alarm_state="FFFFFFFF"#报警状态
+                le = len(work_state+alarm_state) / 2
+                usual_body = "F701" + sensor + tp.to_hex(le, 2) + work_state + alarm_state
+
+            elif typ=="F8":#上传基本信息、信息查询
+                a='55555356312E312E30'#公司名称
+                al=len(a)/2
+                b='302E302E31'#产品型号
+                bl = len(b)/2
+                c='322E332E32'#硬件版本号
+                cl=len(c)/2
+                d='342E342E34'#软件版本号
+                dl=len(d)/2
+                e='000000000000000000000001331311'#设备ＩＤ
+                el=len(e)/2
+                f='303132333435363738'#客户代码
+                fl=len(f)/2
+                lent = len(a+b+c+d+e+f)/2
+                usual_body = "F801" + sensor + tp.to_hex(lent,2) + tp.to_hex(al,2) + a + tp.to_hex(bl,2)  + b + tp.to_hex(cl,2) + c + tp.to_hex(dl,2) + d+ tp.to_hex(el,2) + e + tp.to_hex(fl,2) + f#"04test05test109YJBBHV1.109RJBBHV1.003dev070235455"
             else:# 透传类型为非Ｆ３协议时，组装应答数据；实时监控的原始指令下发
                 usual_body = typ+ "323034393338303233393834303233383430393332383432333432333432346F6F6F6F6FB0A2C0ADC9BDBFDABDB2B5C0C0EDC8F8BFCBBDA8B5B5C1A2BFA8313235393939313233343536373839313233343536373839313233343536373839313131313233343536373839313233343536373839313233343536373839313131"
             usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
