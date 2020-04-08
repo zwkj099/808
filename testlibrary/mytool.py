@@ -281,40 +281,43 @@ class mytool(object):
         alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(attach_Count, 2)+"00"
         data0=jctool.to_hex(speed, 2) + jctool.to_hex(high, 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(zstatus,4) + alarm
         tire_alarm_info = jctool.to_hex(tire_num,2)+""
-
+        alarmID="00000001"#报警ＩＤ（DWORD)
         # 驾驶辅助功能报警信息
         if id==100:
-            data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2) + jctool.to_hex(speed, 2) + "09"+jctool.to_hex(deviate, 2) + jctool.to_hex(road_sign, 2)+"00" + data0
+            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2) + jctool.to_hex(speed, 2) + "09"+jctool.to_hex(deviate, 2) + jctool.to_hex(road_sign, 2)+"00" + data0
         # 驾驶员行为监测功能报警信息
         elif id==101:
-            data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2)+jctool.to_hex(fatigue, 2) + "00000000" + data0
+            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2)+jctool.to_hex(fatigue, 2) + "00000000" + data0
         # 激烈驾驶报警信息
         elif id==112:
-            data = "00000001"+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ "0009" + "0008" + "0008"+ data0
+            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ "0009" + "0008" + "0008"+ data0
         # 轮胎状态监测报警信息
         elif id==102:
             if port==6998: #浙标中盲区监测对应外设ID为66
-                data = "00000001" + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
+                data = alarmID + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
             else:
                 while tire_num>0:
                     tire_alarm_info += jctool.to_hex(tire_loc, 2) + jctool.to_hex(tire_alarm_type,4) + jctool.to_hex(tire_pressure, 4) + jctool.to_hex(tire_temp, 4) + jctool.to_hex(tire_electric, 4)
                     tire_loc += 1
                     tire_num -= 1
-                data = "00000001" + jctool.to_hex(sign,2) + data0 + tire_alarm_info
+                data = alarmID + jctool.to_hex(sign,2) + data0 + tire_alarm_info
 
         # 盲区监测报警信息
         elif id==103:
-            data = "00000001" + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
+            data = alarmID + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
         # 卫星定位系统报警信息
         elif id==113:
-            data = "000000010001000900" + data0
+            data = alarmID+"0001000900" + data0
+        #不按规定上下客及超员检测报警信息
+        elif id==104:
+            data = alarmID + jctool.to_hex(sign, 2) + jctool.to_hex(event,2) + jctool.to_hex(level, 2) + "0000000000" + data0
         else:
             print "无主动安全数据",id
             data=""
         lent = len(data) / 2 + 1
-        # 组装为cb信息并返回
-        cbdata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
-        return cbdata
+        # 组装为信息并返回
+        zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
+        return zddata
 
     def extra_info(self, ids=None, extrainfos=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
         """# 组装附加信息"""
