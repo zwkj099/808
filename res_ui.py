@@ -90,7 +90,7 @@ class fwindow(wind, base):
                                 id = res[2:6]
                                 ac = res[22:26]
                                 usual_body =ac+id+reno
-                                print usual_body
+                                # print usual_body
                                 usual_head = tp.data_head(mobile, 1, usual_body, 5)
                                 usual_redata = tp.add_all(usual_head + usual_body)
                                 tp.send_data(link, usual_redata)

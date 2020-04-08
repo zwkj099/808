@@ -25,7 +25,7 @@ class mytool(object):
         pass
 
     # 组装head头，传入参数包括手机号，消息id，消息体，流水号（可不传，默认0000）
-    def data_head(self, mobile, newid, data, xulie=1,version=0):
+    def data_head(self, mobile, newid, data, xulie=1,version=0,num1=0,totalpack=0):
         '''
         组装消息头
         :param mobile: 手机号
@@ -33,17 +33,26 @@ class mytool(object):
         :param data:消息体，包括基本信息，附加信息，f3信息
         :param xulie:消息流水号，默认0000
         :param version:协议版本，１表示808-2019，０表示808-2013
+        :param num1:第几个分包
+        :param totalpack:分包总数
         :return:对应消息id的消息头信息
+
         '''
         lenth = len(data) / 2
+        num = num1+1
         if version==0:
             while len(mobile) < 12:
                 mobile = "0" + mobile
-            head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+            if totalpack==0:
+                head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
+            else:##如果分包数不为0
+                lenth = lenth + 8192  # 加上分包位的值
+                head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie,4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         elif version==1:
             while len(mobile) < 20:
                 mobile = "0" + mobile
             head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
+
         return head
     # 组装报文body，传入ascii码的设备号和车牌号
     def data_zc_body(self, deviceid, vnum,version):
@@ -121,7 +130,7 @@ class mytool(object):
         else:
             print "消息ID有误，请输入位置消息ID 512或1796"
 
-    def zd_body(self,ids=None, zds=None,ti=0):
+    def zd_body(self,ids=None, pdict=None,sichuandict=None,deviceid=None,port=6975,ti=0):
         '''组装主动安全附加信息
         :param ids: 外设ID,可以同时传入多个（100、101、102、103、112、113）
         :param sign:标志状态
@@ -139,17 +148,21 @@ class mytool(object):
         :param returnr:返回主动安全报警数据
         '''
         ZDAQ_body = ""
-        sign, event, level, deviate, road_sign, fatigue,jin, wei, high, speed, zstatus, deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type=zds
+        # sign, event, level, deviate, road_sign, fatigue,jin, wei, high, speed, zstatus, deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type=zds
+
+
         for id in ids:
             if id in (100,101,102,103,112,113):
-                body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type)
+                # body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type)
+                body = self.add_zdaq(id, pdict,sichuandict,deviceid,port)
                 ZDAQ_body += body
             else:
                 print "无主动安全数据"
         return ZDAQ_body
 
-    def f3_attach(self,ids=None,info=None):
-        '''组装F3附加信息
+    # def f3_attach(self,ids=None, oils=None, wds=None, sds=None, yhs=None, zfs=None, zzs=None, gss=None, lcs=None,base=None,wifi=None,lys=None):
+    def f3_attach(self,ids=None, pdict=None, sensordict=None,bluetoothdict=None):
+        '''组装F3附加信息，目前只实现了油量
                     :param ids: 传感器ID，十进制数
                     :param Oils:油量相关参数，包含 AD值,oil加油量,high液位高度
                     :param wds: 温度相关参数
@@ -161,68 +174,68 @@ class mytool(object):
                     :param lcs: 里程相关参数
                     :param return:返回F3附加信息
                     '''
-        oils, wds, sds, yhs, zfs, zzs, gss, lcs, base, wifi, zdjc, dljc, lys = info
+
         data = ""
         cont = 0#用来计算上传的传感器个数
         for i in ids:
             if i in (33,34,35,36,37):# 温度
-                sign, temp, times, warn = wds
-                data += self.add_wd(i, sign, temp, times, warn)
+                data += self.add_wd(i, sensordict['sign'], sensordict['temp'], sensordict['times'], sensordict['warn']) # 温度传感器参数
                 cont = cont + 1
             elif i in (38,39,40,41):# 湿度
-                sign, hum, times, warn = sds
-                data += self.add_sd(i, sign, hum, times, warn)
+                data += self.add_sd(i, sensordict['sign'],sensordict['hum'],sensordict['times'],sensordict['warn'])
                 cont = cont + 1
             elif i in (65,66,67,68):# 油量、液位
-                AD, Oil, high,addoil= oils
-                data += self.add_yw(i, 0, AD, 300, 310, addoil, 0, Oil, 0, high)
+                data += self.add_yw(i, sensordict['oil_sign'], sensordict['AD'], sensordict['liquid_temp'], sensordict['env_temp'], sensordict[
+                    'addoil'], sensordict['spilloil'], sensordict['Oil'],0, pdict['high'])
                 cont = cont + 1
             elif i in (69,70):# 油耗
-                oilsp, oiltemp, tio, times = yhs
-                data += self.add_yh(i, oilsp, oiltemp, tio, times)
+                data += self.add_yh(i, sensordict['oilsp'],sensordict['oiltemp'],sensordict['tio'],sensordict['times'])
                 cont = cont + 1
             elif i == 79:  # 4Ｆ电量检测
-                data_id, alarm_id, electric, traffic_volume, refrigerated_capacity,communication_type, operator = dljc
-                data += self.add_dljc(i, data_id,alarm_id,electric,traffic_volume,refrigerated_capacity,communication_type, operator)
+                data += self.add_dljc(i, sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],\
+                                      sensordict['traffic_volume'],sensordict['refrigerated_capacity'],sensordict['communication_type'],sensordict['operator'])
                 cont = cont + 1
             elif i == 80:  # 终端信息检测
-                alarm_id, vehicle_status = zdjc
-                data += self.add_zdjc(i,alarm_id,vehicle_status, 0, 0)
+                data += self.add_zdjc(i,sensordict['alarm_id'],sensordict['vehicle_status'], 0, 0)
                 cont = cont + 1
             elif i == 81:  # 正反转
-                sign, zt, fx, xs, times, li, xtimes = zfs
-                data += self.add_zf(i, sign, zt, fx, xs, times, li, xtimes)
+                data += self.add_zf(i, sensordict['sign'],sensordict['zts'],sensordict['fx'],sensordict['xs'],sensordict['times'],sensordict['li'],sensordict['xtimes'])
                 cont = cont + 1
             elif i == 83:  # 里程
-                lc, sp = lcs
-                data += self.add_lc(i, lc, sp)
+                data += self.add_lc(i, sensordict['mel'],sensordict['speed'])
                 cont = cont + 1
             elif i == 84:  # 蓝牙信标
-                num, UUID, signal, distance, battery = lys
-                data += self.add_ly(i, num,UUID,signal,distance,battery)
+                data += self.add_ly(i, bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery'])
                 cont=cont+1
             elif i in (112,113):#载重
-                sign, dw, zt, cs, zl, zzzl, ad1, ad2, ad3 = zzs
-                data += self.add_zz(i, sign, dw, zt, cs, zl, zzzl, ad1, ad2, ad3)
+                data += self.add_zz(i, sensordict['sign'],sensordict['dw'],sensordict['zt'],sensordict['cs'],sensordict['zl'],sensordict['zzzl'],\
+               sensordict['ad1'],sensordict['ad2'],sensordict['ad3'],sensordict['datalen'])
                 cont = cont + 1
             elif i in (128,129):# 工时
-                fs, zt, ztime, bd, sj = gss
-                data += self.add_gs(i, fs, zt, ztime, bd, sj)
+                data += self.add_gs(i, sensordict['fs'],sensordict['ztt'],sensordict['ztime'],sensordict['bd'],sensordict['sj'],sensordict['gslen'])
                 cont = cont + 1
         ## 处理基站和wifi数据
         if ids.__contains__(8)==True and ids.__contains__(9)==False:
             #组装基站
-            basever, report_frequency, position_mode, time_num, start_time, info_status, info_groupnum, mcc, sid, lac_nid, cell_bid, bcch, bsic, dbm, c1, c2, txp, rla, tch, ta, rxq_sub, rxq_full=base
-            data += self.add_base(8,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full)
+            data += self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
+                    sensordict['time_num'], sensordict['start_time'], sensordict['info_status'], \
+                    sensordict['info_groupnum'], sensordict['mcc'], sensordict['sid'], sensordict['lac_nid'],
+                    sensordict['cell_bid'], sensordict['bcch'], sensordict['bsic'], sensordict['dbm'], \
+                    sensordict['c1'], sensordict['c2'], sensordict['txp'], sensordict['rla'], sensordict['tch'],
+                    sensordict['ta'], sensordict['rxq_sub'], sensordict['rxq_full'])
             cont +=1
         elif ids.__contains__(8)==True and ids.__contains__(9)==True:
-            #组装基站和wifi
-            basever, report_frequency, position_mode, time_num, start_time, info_status, info_groupnum, mcc, sid, lac_nid, cell_bid, bcch, bsic, dbm, c1, c2, txp, rla, tch, ta, rxq_sub, rxq_full=base
-            data += self.add_base(8,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full)
+            #组装基站和wifi,要上传wifi数据，必须要同时上传基站数据
+            data += self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
+                    sensordict['time_num'], sensordict['start_time'], sensordict['info_status'], \
+                    sensordict['info_groupnum'], sensordict['mcc'], sensordict['sid'], sensordict['lac_nid'],
+                    sensordict['cell_bid'], sensordict['bcch'], sensordict['bsic'], sensordict['dbm'], \
+                    sensordict['c1'], sensordict['c2'], sensordict['txp'], sensordict['rla'], sensordict['tch'],
+                    sensordict['ta'], sensordict['rxq_sub'], sensordict['rxq_full'])
             cont +=1
 
-            ver,softver,electric,csq,groupnum,mac,wifi_sign = wifi
-            data += self.add_wifi(9,ver,softver,electric,csq,groupnum,mac,wifi_sign)
+            data += self.add_wifi(9,sensordict['ver'], sensordict['softver'], sensordict['electric'], sensordict['csq'],
+                    sensordict['groupnum'], sensordict['mac'], sensordict['wifi_sign'])
             cont += 1
         return self.add_f3_data(cont, data)
 
@@ -232,7 +245,7 @@ class mytool(object):
                jctool.to_hex(mcc, 4) + jctool.to_hex(sid, 4) + jctool.to_hex(lac_nid, 4) + jctool.to_hex(cell_bid, 4) + jctool.to_hex(bcch, 4) + \
                jctool.to_hex(bsic, 4) + jctool.to_hex(dbm, 2) + jctool.to_hex(c1, 4) + jctool.to_hex(c2,4) + jctool.to_hex(txp, 2) + \
                jctool.to_hex(rla, 2) + jctool.to_hex(tch, 4) + jctool.to_hex(ta, 2) + jctool.to_hex(rxq_sub,2) + jctool.to_hex(rxq_full, 2)
-        print data
+        # print data
         return data
     
     def add_wifi(self,id,ver,softver,electric,csq,groupnum,mac,wifi_sign):
@@ -245,11 +258,12 @@ class mytool(object):
 
         #     data=hexcovert.to_hex(id,2)+"0C"+hexcovert.to_hex(ver,2)+hexcovert.to_hex(softver,16)+hexcovert.to_hex(electric,2)+\
         #          hexcovert.to_hex(csq,2)+hexcovert.to_hex(grouopnum,2)
-        print mac
-        print data
+        # print mac
+        # print data
         return data
 
-    def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count,port=6975,tire_num=0,tire_loc=0,tire_alarm_type=40,tire_pressure=3,tire_temp=35,tire_electric=50):
+    # def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count,port=6975,tire_num=0,tire_loc=0,tire_alarm_type=40,tire_pressure=3,tire_temp=35,tire_electric=50):
+    def add_zdaq(self, id, pdict,sichuandict,deviceid,port,tire_pressure=3,tire_temp=35,tire_electric=50):
         ''' 川冀标主动安全数据
         :param id: 外设ID（100、101、102、103、112、113）
         :param port:监控对象协议对应端口号
@@ -272,45 +286,48 @@ class mytool(object):
         :param tire_pressure :胎压
         :param tire_temp :胎温
         :param tire_electric:电池电量
+
         '''
-        jin = float(jin) * 1000000
-        wei = float(wei) * 1000000
+
+        jin = float( pdict['jin']) * 1000000
+        wei = float(pdict['wei']) * 1000000
         ti = time.strftime("%y%m%d%H%M%S", time.localtime())
         # date = datetime.datetime.strptime('2019-08-08 09:00:00', "%Y-%m-%d %H:%M:%S")
         # ti = date.strftime("%y%m%d%H%M%S")
-        alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(attach_Count, 2)+"00"
-        data0=jctool.to_hex(speed, 2) + jctool.to_hex(high, 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(zstatus,4) + alarm
-        tire_alarm_info = jctool.to_hex(tire_num,2)+""
+        alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(sichuandict['attach_Count'], 2)+"00"
+        data0=jctool.to_hex(pdict['speed'], 2) + jctool.to_hex(pdict['high'], 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(sichuandict['zstatus'],4) + alarm
+        tire_alarm_info = jctool.to_hex(sichuandict['tire_num'],2)+""
         alarmID="00000001"#报警ＩＤ（DWORD)
         # 驾驶辅助功能报警信息
         if id==100:
-            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2) + jctool.to_hex(speed, 2) + "09"+jctool.to_hex(deviate, 2) + jctool.to_hex(road_sign, 2)+"00" + data0
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2) + jctool.to_hex(pdict['speed'], 2) + "09"+jctool.to_hex(sichuandict['deviate'], 2)\
+                   + jctool.to_hex(sichuandict['road_sign'], 2)+"00" + data0
         # 驾驶员行为监测功能报警信息
         elif id==101:
-            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ jctool.to_hex(level, 2)+jctool.to_hex(fatigue, 2) + "00000000" + data0
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2)+jctool.to_hex(sichuandict['fatigue'], 2) + "00000000" + data0
         # 激烈驾驶报警信息
         elif id==112:
-            data = alarmID+jctool.to_hex(sign, 2)+jctool.to_hex(event, 2)+ "0009" + "0008" + "0008"+ data0
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ "0009" + "0008" + "0008"+ data0
         # 轮胎状态监测报警信息
         elif id==102:
             if port==6998: #浙标中盲区监测对应外设ID为66
-                data = alarmID + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
+                data = alarmID + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
             else:
-                while tire_num>0:
-                    tire_alarm_info += jctool.to_hex(tire_loc, 2) + jctool.to_hex(tire_alarm_type,4) + jctool.to_hex(tire_pressure, 4) + jctool.to_hex(tire_temp, 4) + jctool.to_hex(tire_electric, 4)
-                    tire_loc += 1
-                    tire_num -= 1
-                data = alarmID + jctool.to_hex(sign,2) + data0 + tire_alarm_info
+                while sichuandict['tire_num']>0:
+                    tire_alarm_info += jctool.to_hex(sichuandict['tire_loc'], 2) + jctool.to_hex(sichuandict['tire_alarm_type'],4) + jctool.to_hex(tire_pressure, 4) + jctool.to_hex(tire_temp, 4) + jctool.to_hex(tire_electric, 4)
+                    sichuandict['tire_loc'] += 1
+                    sichuandict['tire_num'] -= 1
+                data = alarmID + jctool.to_hex(sichuandict['sign'],2) + data0 + tire_alarm_info
 
         # 盲区监测报警信息
         elif id==103:
-            data = alarmID + jctool.to_hex(sign,2)+jctool.to_hex(event,2)+data0
+            data = alarmID + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
         # 卫星定位系统报警信息
         elif id==113:
             data = alarmID+"0001000900" + data0
         #不按规定上下客及超员检测报警信息
         elif id==104:
-            data = alarmID + jctool.to_hex(sign, 2) + jctool.to_hex(event,2) + jctool.to_hex(level, 2) + "0000000000" + data0
+            data = alarmID + jctool.to_hex(sichuandict['sign'], 2) + jctool.to_hex(sichuandict['event'],2) + jctool.to_hex(sichuandict['level'], 2) + "0000000000" + data0
         else:
             print "无主动安全数据",id
             data=""
@@ -319,34 +336,34 @@ class mytool(object):
         zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
         return zddata
 
-    def extra_info(self, ids=None, extrainfos=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
+    def extra_info(self, ids=None, ex808dict=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
         """# 组装附加信息"""
-        vedio_alarm, vedio_signal, memery, abnormal_driving, meilage, oil, extra_speed, by, wn,temper=extrainfos
+
         data = ""
         for i in ids:
             if i == 1:
-                meilage = int(float(meilage) * 10)  #里程，DWORD，1/10km，对应车上里程表读数
+                meilage = int(float(ex808dict['mel']) * 10)  #里程，DWORD，1/10km，对应车上里程表读数
                 data += self.add_additional(i, 4, meilage)
             elif i == 2:
-                oil = int(float(oil) * 10) #油量，WORD，1/10L，对应车上油量表读数
+                oil = int(float(ex808dict['oil']) * 10) #油量，WORD，1/10L，对应车上油量表读数
                 data += self.add_additional(i, 2, oil)
             elif i == 3:
-                speed = int(float(extra_speed) * 10)#行驶记录功能获取的速度，WORD，1/10km/h
+                speed = int(float(ex808dict['extra_speed']) * 10)#行驶记录功能获取的速度，WORD，1/10km/h
                 data += self.add_additional(i, 2, speed)
             elif i == 6:
-                data +=self.add_additional(i,2,temper) #车箱温度
+                data +=self.add_additional(i,2,ex808dict['temper']) #车箱温度
             elif i == 20:
-                data += self.add_additional(i, 4, vedio_alarm)# 1078协议，视频相关报警
+                data += self.add_additional(i, 4, ex808dict['vedio_alarm'])# 1078协议，视频相关报警
             elif i in (21, 22):
-                data += self.add_additional(i, 4, vedio_signal)  # 1078协议，视频信号丢失报警状态、视频信号遮挡报警状态
+                data += self.add_additional(i, 4, ex808dict['vedio_signal'])  # 1078协议，视频信号丢失报警状态、视频信号遮挡报警状态
             elif i == 23:
-                data += self.add_additional(i, 2, memery)# 1078协议，存储器故障报警状态
+                data += self.add_additional(i, 2, ex808dict['memery'])# 1078协议，存储器故障报警状态
             elif i == 24:
-                data += self.add_additional(i, 2, abnormal_driving)#1078协议，异常驾驶行为报警详细描述
+                data += self.add_additional(i, 2, ex808dict['abnormal_driving'])#1078协议，异常驾驶行为报警详细描述
             elif i == 48:
-                data += self.add_additional(i, 1, by)#无线通信网络信号强度
+                data += self.add_additional(i, 1, ex808dict['by'])#无线通信网络信号强度
             elif i == 49:
-                data += self.add_additional(i, 1, wn)#GNSS 定位卫星数
+                data += self.add_additional(i, 1, ex808dict['wn'])#GNSS 定位卫星数
             else:
                 print "无附加信息", i
                 data = ""
@@ -621,7 +638,7 @@ class mytool(object):
         data = jctool.to_hex(id, 2) +jctool.to_hex(size,2)+data0
         return data
 
-    def add_zf(self,id,sign,zt,fx,xs,times,li,xtimes):
+    def add_zf(self,id,sign,zts,fx,xs,times,li,xtimes):
         '''
         组装正反转传感器报文
         :param sign:重要数据标识（0-正常，2-重要）
@@ -634,7 +651,7 @@ class mytool(object):
         :return:正反转传感器报文
         '''
         times=float(times)*10
-        data=jctool.to_hex(id,2)+"18"+jctool.to_hex(sign,2)+jctool.to_hex(zt,6)+jctool.to_hex(fx,8)+jctool.to_hex(xs,8)+jctool.to_hex(times,8)+jctool.to_hex(li,8)+jctool.to_hex(xtimes,8)
+        data=jctool.to_hex(id,2)+"18"+jctool.to_hex(sign,2)+jctool.to_hex(zts,6)+jctool.to_hex(fx,8)+jctool.to_hex(xs,8)+jctool.to_hex(times,8)+jctool.to_hex(li,8)+jctool.to_hex(xtimes,8)
         return data
 
     def add_ly(self,id,count,UUID,signal,distance,battery):
@@ -668,7 +685,7 @@ class mytool(object):
         data = jctool.to_hex(id, 2) + "08" + jctool.to_hex(lc, 8) + jctool.to_hex(sp, 8)
         return data
 
-    def add_zz(self,id,sign,dw,zt,cs,zl,zzzl,ad1,ad2,ad3):
+    def add_zz(self,id,sign,dw,zt,cs,zl,zzzl,ad1,ad2,ad3,datalen='18'):
         '''
         组装载重传感器报文
         :param id: 传感器id（70,71,对应112,113）
@@ -683,10 +700,14 @@ class mytool(object):
         :param ad3:浮动零点
         :return:
         '''
-        data=jctool.to_hex(id,2)+"18"+jctool.to_hex(sign,4)+jctool.to_hex(dw,2)+jctool.to_hex(zt,2)+"0000"+jctool.to_hex(cs,4)+"0000"+jctool.to_hex(zl,4)+jctool.to_hex(zzzl,4)+jctool.to_hex(ad1,4)+"0000"+jctool.to_hex(ad2,4)+"0000"+jctool.to_hex(ad3,4)
+        if int(datalen)<10:
+            datalen = "0"+str(int(datalen))
+        else:
+            datalen = str(int(datalen))
+        data=jctool.to_hex(id,2)+str(datalen)+jctool.to_hex(sign,4)+jctool.to_hex(dw,2)+jctool.to_hex(zt,2)+"0000"+jctool.to_hex(cs,4)+"0000"+jctool.to_hex(zl,4)+jctool.to_hex(zzzl,4)+jctool.to_hex(ad1,4)+"0000"+jctool.to_hex(ad2,4)+"0000"+jctool.to_hex(ad3,4)
         return data
 
-    def add_gs(self,id,fs,zt,ztime,bd,sj):
+    def add_gs(self,id,fs,ztt,ztime,bd,sj,gslen='0C'):
         '''
         组装工时传感器数据
         :param id:工时传感器id（80,81,对应128,129）
@@ -697,7 +718,7 @@ class mytool(object):
         :param sj:工时数据（0.1V或0.01L/H）
         :return:工时传感器数据
         '''
-        data=jctool.to_hex(id,2)+"0C"+jctool.to_hex(fs,4)+jctool.to_hex(zt,4)+jctool.to_hex(ztime,8)+jctool.to_hex(bd,4)+jctool.to_hex(sj,4)
+        data=jctool.to_hex(id,2)+str(gslen)+jctool.to_hex(fs,4)+jctool.to_hex(ztt,4)+jctool.to_hex(ztime,8)+jctool.to_hex(bd,4)+jctool.to_hex(sj,4)
         return data
 
     def add_zio(self,k0,k1,k2,k3):
@@ -855,3 +876,15 @@ class mytool(object):
         return bw
 
 
+    def footfall_info(self,mobile,starttime,endtime,getonnum,getoffnum,version):
+        """
+        :param starttime:
+        :param endtime:
+        :param getonnum:
+        :param getoffnum:
+        :return:
+        """
+        dbody = str(starttime)+str(endtime)+jctool.to_hex(getonnum,4)+jctool.to_hex(getoffnum,4)
+        hhead = self.data_head(mobile, 4101, dbody, 1, version)
+        data = self.add_all(hhead + dbody)
+        return data
