@@ -15,20 +15,18 @@ def location(tp, link, mobile,pdict, sichuandict, ex808dict, sensordict,bluetoot
     # print gpsdata
     ###########  分包：针对0704批量上传位置信息 ############
     '''
-    消息最多发送长度为1024个字节，即2048个字符
-    标识位+消息头+校验码+标识位 长度为38字符
-    消息体最长只能为2048-38=2010字符,故消息体大于2010需要分包
+    消息最多发送长度为1023个字节，即2046个字符
     '''
     gpsbody =[]
-    if int(pdict['messageid'])==1796 and len(gpsdata)>2010:
-        if len(gpsdata)%2010==0:
-            count = (len(gpsdata)/2010)
+    if len(gpsdata)>2046:
+        if len(gpsdata)%2046==0:
+            count = (len(gpsdata)/2046)
         else:
-            count = (len(gpsdata)/2010)+1
+            count = (len(gpsdata)/2046)+1
         for j in range(0,count):
-            if len(gpsdata)>2010:
-                gpsbody.append(gpsdata[:2010])
-                gpsdata=gpsdata[2010:]
+            if len(gpsdata)>2046:
+                gpsbody.append(gpsdata[:2046])
+                gpsdata=gpsdata[2046:]
             else:
                 gpsbody.append(gpsdata)
 
