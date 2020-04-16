@@ -46,7 +46,7 @@ class mytool(object):
             if totalpack==0:
                 head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
             else:##如果分包数不为0
-                lenth = lenth + 8192  # 加上分包位的值
+                lenth = lenth + 8192  # 加上分包位的值，13位为1
                 head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie,4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         elif version==1:
             while len(mobile) < 20:
@@ -54,7 +54,7 @@ class mytool(object):
             if totalpack == 0:
                 head = jctool.to_hex(newid, 4) + jctool.to_hex(4, 1) + jctool.to_hex(lenth, 3) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
             else:
-                lenth = lenth + 8192  # 加上分包位的值
+                lenth = lenth + 24576  # 加上分包位的值　14、13位为1
                 head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + jctool.to_hex(version, 2) + str(mobile) + jctool.to_hex(xulie, 4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         return head
     # 组装报文body，传入ascii码的设备号和车牌号
