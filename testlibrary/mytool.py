@@ -46,13 +46,16 @@ class mytool(object):
             if totalpack==0:
                 head = jctool.to_hex(newid,4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie, 4)
             else:##如果分包数不为0
-                lenth = lenth + 8192  # 加上分包位的值
+                lenth = lenth + 8192  # 加上分包位的值，13位为1
                 head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + str(mobile) + jctool.to_hex(xulie,4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         elif version==1:
             while len(mobile) < 20:
                 mobile = "0" + mobile
-            head = jctool.to_hex(newid, 4) + jctool.to_hex(64, 2) + jctool.to_hex(lenth, 2) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
-
+            if totalpack == 0:
+                head = jctool.to_hex(newid, 4) + jctool.to_hex(4, 1) + jctool.to_hex(lenth, 3) + jctool.to_hex(version,2) + str(mobile) + jctool.to_hex(xulie, 4)
+            else:
+                lenth = lenth + 24576  # 加上分包位的值　14、13位为1
+                head = jctool.to_hex(newid, 4) + jctool.to_hex(lenth, 4) + jctool.to_hex(version, 2) + str(mobile) + jctool.to_hex(xulie, 4) + jctool.to_hex(totalpack, 4) + jctool.to_hex(num, 4)
         return head
     # 组装报文body，传入ascii码的设备号和车牌号
     def data_zc_body(self, deviceid, vnum,version):
@@ -176,68 +179,93 @@ class mytool(object):
                     '''
 
         data = ""
+        data0 = ""
+        f3_data = ""
+        c=3
         cont = 0#用来计算上传的传感器个数
         for i in ids:
             if i in (33,34,35,36,37):# 温度
-                data += self.add_wd(i, sensordict['sign'], sensordict['temp'], sensordict['times'], sensordict['warn']) # 温度传感器参数
-                cont = cont + 1
+                data0 = self.add_wd(i, sensordict['sign'], sensordict['temp'], sensordict['times'], sensordict['warn']) # 温度传感器参数
             elif i in (38,39,40,41):# 湿度
-                data += self.add_sd(i, sensordict['sign'],sensordict['hum'],sensordict['times'],sensordict['warn'])
-                cont = cont + 1
+                data0 = self.add_sd(i, sensordict['sign'],sensordict['hum'],sensordict['times'],sensordict['warn'])
             elif i in (65,66,67,68):# 油量、液位
-                data += self.add_yw(i, sensordict['oil_sign'], sensordict['AD'], sensordict['liquid_temp'], sensordict['env_temp'], sensordict[
+                data0 = self.add_yw(i, sensordict['oil_sign'], sensordict['AD'], sensordict['liquid_temp'], sensordict['env_temp'], sensordict[
                     'addoil'], sensordict['spilloil'], sensordict['Oil'],0, pdict['high'])
-                cont = cont + 1
             elif i in (69,70):# 油耗
-                data += self.add_yh(i, sensordict['oilsp'],sensordict['oiltemp'],sensordict['tio'],sensordict['times'])
-                cont = cont + 1
+                data0 = self.add_yh(i, sensordict['oilsp'],sensordict['oiltemp'],sensordict['tio'],sensordict['times'])
             elif i == 79:  # 4Ｆ电量检测
-                data += self.add_dljc(i, sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],\
+                data0 = self.add_dljc(i, sensordict['data_id'],sensordict['alarm_id'],sensordict['terminal_power'],\
                                       sensordict['traffic_volume'],sensordict['refrigerated_capacity'],sensordict['communication_type'],sensordict['operator'])
-                cont = cont + 1
             elif i == 80:  # 终端信息检测
-                data += self.add_zdjc(i,sensordict['alarm_id'],sensordict['vehicle_status'], 0, 0)
-                cont = cont + 1
+                data0 = self.add_zdjc(i,sensordict['alarm_id'],sensordict['vehicle_status'], 0, 0)
             elif i == 81:  # 正反转
-                data += self.add_zf(i, sensordict['sign'],sensordict['zts'],sensordict['fx'],sensordict['xs'],sensordict['times'],sensordict['li'],sensordict['xtimes'])
-                cont = cont + 1
+                data0 = self.add_zf(i, sensordict['sign'],sensordict['zts'],sensordict['fx'],sensordict['xs'],sensordict['times'],sensordict['li'],sensordict['xtimes'])
             elif i == 83:  # 里程
-                data += self.add_lc(i, sensordict['mel'],sensordict['speed'])
-                cont = cont + 1
+                data0 = self.add_lc(i, sensordict['mel'],sensordict['speed'])
             elif i == 84:  # 蓝牙信标
-                data += self.add_ly(i, bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery'])
-                cont=cont+1
+                data0 = self.add_ly(i, bluetoothdict['num'],bluetoothdict['UUID'],bluetoothdict['signal'],bluetoothdict['distance'],bluetoothdict['battery'])
             elif i in (112,113):#载重
-                data += self.add_zz(i, sensordict['sign'],sensordict['dw'],sensordict['zt'],sensordict['cs'],sensordict['zl'],sensordict['zzzl'],\
+                data0 = self.add_zz(i, sensordict['sign'],sensordict['dw'],sensordict['zt'],sensordict['cs'],sensordict['zl'],sensordict['zzzl'],\
                sensordict['ad1'],sensordict['ad2'],sensordict['ad3'],sensordict['datalen'])
-                cont = cont + 1
             elif i in (128,129):# 工时
-                data += self.add_gs(i, sensordict['fs'],sensordict['ztt'],sensordict['ztime'],sensordict['bd'],sensordict['sj'],sensordict['gslen'])
+                data0 = self.add_gs(i, sensordict['fs'],sensordict['ztt'],sensordict['ztime'],sensordict['bd'],sensordict['sj'],sensordict['gslen'])
+
+            #判断长度是否超过255，超过则分开组装，将data0赋值到下一轮组装数据中
+            if (len(data0 + data) / 2 + 1) < 255:
+                data += data0
                 cont = cont + 1
-        ## 处理基站和wifi数据
+            else:
+                f3_data += self.add_f3_data(cont, data, c)
+                data = data0
+                cont = 1
+                c += 1
+
+        # 处理基站和wifi数据
         if ids.__contains__(8)==True and ids.__contains__(9)==False:
             #组装基站
-            data += self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
+            data0 = self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
                     sensordict['time_num'], sensordict['start_time'], sensordict['info_status'], \
                     sensordict['info_groupnum'], sensordict['mcc'], sensordict['sid'], sensordict['lac_nid'],
                     sensordict['cell_bid'], sensordict['bcch'], sensordict['bsic'], sensordict['dbm'], \
                     sensordict['c1'], sensordict['c2'], sensordict['txp'], sensordict['rla'], sensordict['tch'],
                     sensordict['ta'], sensordict['rxq_sub'], sensordict['rxq_full'])
-            cont +=1
+            if (len(data0 + data) / 2 + 1) < 255:
+                data += data0
+                cont = cont + 1
+            else:
+                f3_data += self.add_f3_data(cont, data, c)
+                data = data0
+                cont = 1
+                c += 1
         elif ids.__contains__(8)==True and ids.__contains__(9)==True:
             #组装基站和wifi,要上传wifi数据，必须要同时上传基站数据
-            data += self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
+            data0 = self.add_base(8,sensordict['basever'], sensordict['report_frequency'], sensordict['position_mode'],
                     sensordict['time_num'], sensordict['start_time'], sensordict['info_status'], \
                     sensordict['info_groupnum'], sensordict['mcc'], sensordict['sid'], sensordict['lac_nid'],
                     sensordict['cell_bid'], sensordict['bcch'], sensordict['bsic'], sensordict['dbm'], \
                     sensordict['c1'], sensordict['c2'], sensordict['txp'], sensordict['rla'], sensordict['tch'],
                     sensordict['ta'], sensordict['rxq_sub'], sensordict['rxq_full'])
-            cont +=1
+            if (len(data0 + data) / 2 + 1) < 255:
+                data += data0
+                cont = cont + 1
+            else:
+                f3_data += self.add_f3_data(cont, data, c)
+                data = data0
+                cont = 1
+                c += 1
 
-            data += self.add_wifi(9,sensordict['ver'], sensordict['softver'], sensordict['electric'], sensordict['csq'],
+            data0 = self.add_wifi(9,sensordict['ver'], sensordict['softver'], sensordict['electric'], sensordict['csq'],
                     sensordict['groupnum'], sensordict['mac'], sensordict['wifi_sign'])
-            cont += 1
-        return self.add_f3_data(cont, data)
+            if (len(data0 + data) / 2 + 1) < 255:
+                data += data0
+                cont = cont + 1
+            else:
+                f3_data += self.add_f3_data(cont, data, c)
+                data = data0
+                cont = 1
+                c += 1
+        f3_data +=self.add_f3_data(cont, data,c)
+        return f3_data
 
     def add_base(self,id,basever,report_frequency,position_mode,time_num,start_time,info_status,info_groupnum,mcc,sid,lac_nid,cell_bid,bcch,bsic,dbm,c1,c2,txp,rla,tch,ta,rxq_sub,rxq_full):
         data = jctool.to_hex(id, 2) + "24" + jctool.to_hex(basever, 2) + jctool.to_hex(report_frequency,8) + jctool.to_hex(position_mode, 2) + \
@@ -297,41 +325,44 @@ class mytool(object):
         alarm= jctool.get_id(deviceid)+str(ti)+"00"+jctool.to_hex(sichuandict['attach_Count'], 2)+"00"
         data0=jctool.to_hex(pdict['speed'], 2) + jctool.to_hex(pdict['high'], 4) + jctool.to_hex(wei, 8) + jctool.to_hex(jin, 8) + str(ti) + jctool.to_hex(sichuandict['zstatus'],4) + alarm
         tire_alarm_info = jctool.to_hex(sichuandict['tire_num'],2)+""
-
+        alarmID="00000001"#报警ＩＤ（DWORD)
         # 驾驶辅助功能报警信息
         if id==100:
-            data = "00000001"+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2) + jctool.to_hex(pdict['speed'], 2) + "09"+jctool.to_hex(sichuandict['deviate'], 2)\
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2) + jctool.to_hex(pdict['speed'], 2) + "09"+jctool.to_hex(sichuandict['deviate'], 2)\
                    + jctool.to_hex(sichuandict['road_sign'], 2)+"00" + data0
         # 驾驶员行为监测功能报警信息
         elif id==101:
-            data = "00000001"+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2)+jctool.to_hex(sichuandict['fatigue'], 2) + "00000000" + data0
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ jctool.to_hex(sichuandict['level'], 2)+jctool.to_hex(sichuandict['fatigue'], 2) + "00000000" + data0
         # 激烈驾驶报警信息
         elif id==112:
-            data = "00000001"+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ "0009" + "0008" + "0008"+ data0
+            data = alarmID+jctool.to_hex(sichuandict['sign'], 2)+jctool.to_hex(sichuandict['event'], 2)+ "0009" + "0008" + "0008"+ data0
         # 轮胎状态监测报警信息
         elif id==102:
             if port==6998: #浙标中盲区监测对应外设ID为66
-                data = "00000001" + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
+                data = alarmID + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
             else:
                 while sichuandict['tire_num']>0:
                     tire_alarm_info += jctool.to_hex(sichuandict['tire_loc'], 2) + jctool.to_hex(sichuandict['tire_alarm_type'],4) + jctool.to_hex(tire_pressure, 4) + jctool.to_hex(tire_temp, 4) + jctool.to_hex(tire_electric, 4)
                     sichuandict['tire_loc'] += 1
                     sichuandict['tire_num'] -= 1
-                data = "00000001" + jctool.to_hex(sichuandict['sign'],2) + data0 + tire_alarm_info
+                data = alarmID + jctool.to_hex(sichuandict['sign'],2) + data0 + tire_alarm_info
 
         # 盲区监测报警信息
         elif id==103:
-            data = "00000001" + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
+            data = alarmID + jctool.to_hex(sichuandict['sign'],2)+jctool.to_hex(sichuandict['event'],2)+data0
         # 卫星定位系统报警信息
         elif id==113:
-            data = "000000010001000900" + data0
+            data = alarmID+"0001000900" + data0
+        #不按规定上下客及超员检测报警信息
+        elif id==104:
+            data = alarmID + jctool.to_hex(sichuandict['sign'], 2) + jctool.to_hex(sichuandict['event'],2) + jctool.to_hex(sichuandict['level'], 2) + "0000000000" + data0
         else:
             print "无主动安全数据",id
             data=""
         lent = len(data) / 2 + 1
-        # 组装为cb信息并返回
-        cbdata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
-        return cbdata
+        # 组装为信息并返回
+        zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
+        return zddata
 
     def extra_info(self, ids=None, ex808dict=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
         """# 组装附加信息"""
@@ -486,16 +517,17 @@ class mytool(object):
         data = jctool.to_hex(id, 2) + jctool.to_hex(size, 2) + jctool.to_hex(information, size*2)
         return data
 
-    def add_f3_data(self,num,data_body):
+    def add_f3_data(self,num,data_body,c):
         '''组装传感器信息组合f3信息，把各个传感器信息打包成f3附加信息
         :param num:传感器数量
         :param data_body: 传感器信息body
+        :param c :当Ｆ３附加消息超过255时，进行Ｆ３附加信息拆分，值从３开始依次递增
         :return: f3附加信息
         '''
         f3data=""
         if num!=0:
             lent=len(data_body)/2+1 #计算f3附加消息长度
-            f3data="F3"+jctool.to_hex(lent,2)+jctool.to_hex(num,2)+data_body #组装为f3信息
+            f3data="F" + str(c)+jctool.to_hex(lent,2)+jctool.to_hex(num,2)+data_body #组装为f3信息
         return f3data
 
     def add_cb_data(self,id,data_body):

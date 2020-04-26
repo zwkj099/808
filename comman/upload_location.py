@@ -5,46 +5,55 @@ Created on 2019年8月19日
 @author: admin
 '''
 import time
-def location(tp, link, mobile,pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid,deviceid,port, answer_number=0000):
-
-    ########## 第三个参数说明要上传的位置条数,第四个为位置数据类型 ：0：正常位置批量汇报，1：盲区补报##########
-    gpsdata = tp.position(mobile, pdict['messageid'], 2, 0, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
-                          pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
-                          tp.extra_info(extrainfo_id,ex808dict),tp.zd_body(wsid,pdict,sichuandict,deviceid,port),tp.f3_attach(idlist,pdict,sensordict,bluetoothdict), pdict['version'],answer_number)
-    # print "location.gpsdata:"
-    # print gpsdata
-    ###########  分包：针对0704批量上传位置信息 ############
+###########  分包 ############
+def subpackage(tp,link,mobile,gpsdata,version,messageid):
     '''
     消息最多发送长度为1024个字节，即2048个字符
-    标识位+消息头+校验码+标识位 长度为38字符
-    消息体最长只能为2048-38=2010字符,故消息体大于2010需要分包
+消息体以外的内容长度：
+    (2013-808)标识位+消息头+校验码+标识位 长度为38字符
+    (2019-808)标识位+消息头+校验码+标识位 长度为48字符
+消息体最大长度:
+    2013-808只能为2048-38=2010字符,故消息体大于2010需要分包
+    2019-808只能为2048-48=2000字符,故消息体大于2000需要分包
     '''
     gpsbody =[]
-    if int(pdict['messageid'])==1796 and len(gpsdata)>2010:
-        if len(gpsdata)%2010==0:
-            count = (len(gpsdata)/2010)
+    size=2010 #默认消息体最长为2010
+    if version==1:#当协议版本为808-2019时，将消息体最长改为2000
+        size=2000
+
+    if len(gpsdata)>size:
+        if len(gpsdata)%size==0:
+            count = (len(gpsdata)/size)
         else:
-            count = (len(gpsdata)/2010)+1
+            count = (len(gpsdata)/size)+1
         for j in range(0,count):
-            if len(gpsdata)>2010:
-                gpsbody.append(gpsdata[:2010])
-                gpsdata=gpsdata[2010:]
+            if len(gpsdata)>size:
+                gpsbody.append(gpsdata[:size])
+                gpsdata=gpsdata[size:]
             else:
                 gpsbody.append(gpsdata)
 
     if gpsbody!=[]:
         print "需要分包："
         for i in range(len(gpsbody)):
-            gpshead = tp.data_head(mobile, pdict['messageid'],gpsbody[i] ,3,pdict['version'],i,count)##将第几个分包、分包总数传给消息头
+            gpshead = tp.data_head(mobile, messageid,gpsbody[i] ,3,version,i,count)##将第几个分包、分包总数传给消息头
             gpsdata1 = tp.add_all(gpshead + gpsbody[i])
             print "分包："+str(i+1)
             tp.send_data(link, gpsdata1)
 
     ##########不分包 ###############
     else:
-        gpshead = tp.data_head(mobile, pdict['messageid'], gpsdata, 3, pdict['version'])
+        gpshead = tp.data_head(mobile, messageid, gpsdata, 3, version)
         gpsdata = tp.add_all(gpshead + gpsdata)
         tp.send_data(link, gpsdata)
+
+def location(tp, link, mobile,pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid,deviceid,port, answer_number=0000):
+
+    ########## 第三个参数说明要上传的位置条数,第四个为位置数据类型 ：0：正常位置批量汇报，1：盲区补报##########
+    gpsdata = tp.position(mobile, pdict['messageid'], 2, 0, pdict['alarm'], pdict['status'], pdict['jin'], pdict['wei'],\
+                          pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
+                          tp.extra_info(extrainfo_id,ex808dict),tp.zd_body(wsid,pdict,sichuandict,deviceid,port),tp.f3_attach(idlist,pdict,sensordict,bluetoothdict), pdict['version'],answer_number)
+    subpackage(tp, link, mobile,gpsdata,pdict['version'],pdict['messageid'])
 
 def initial(tp, link, deviceid, vnum, mobile, version):
     # 注册
