@@ -70,8 +70,8 @@ def main(args,testinfo,tp,link, mobile, extrainfo_id, idlist, wsid,deviceid,port
                 if interrupt_num[mm]!=0:
                     pdict['status']=1
                     if interrupt_drift[mm]!=0:###如果有中断,经纬度变化大点以便离线位移时位移大于50km
-                        pdict['jin'] += 0.2
-                        pdict['wei'] += 0.2
+                        pdict['jin'] += 0.05
+                        pdict['wei'] += 0.05
                         if kk*pdict['period']%(30*60)==0:
                             pdict['status']=3 #变成定位
                     elif interrupt_drift[mm]==0 and kk*pdict['period']%(10*60)==0:

@@ -24,11 +24,11 @@
 		<Key>direction=100</Key>
 		<Key>period=30</Key>
 		<Key>ti=0</Key>
-		<Key>detester=2019-09-8 08:00:00</Key>
+		<Key>detester=2020-01-20 09:00:00</Key>
 		<Key>messageid=512</Key>
 		<Key>version=0</Key>
 		<!--<Key>下面加入redis访问的值</Key>-->
-		<Key>redishost=192.168.24.143</Key>
+		<Key>redishost=192.168.24.142</Key>
 		<Key>db=7</Key>
 		<Key>pwd=ZwLBs_Redis@8F3!</Key>
 
