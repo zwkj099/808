@@ -1,0 +1,5 @@
+文件说明：
+setMileage.py:通过vehicle_id去获取redis最后一条值，并查看是否有里程Mel,如果有，则将该值赋给ex808dict['mel']，否则不设置
+getdb_value.py:通过不同的方法返回不同的redis值
+
+

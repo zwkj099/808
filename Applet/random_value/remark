@@ -1,0 +1,26 @@
+
+   说明：
+   get_randomdata.get_randomdata.py:获取随机值，结果返回正向值、反向值的列表
+   正向值(长度在中间的值，全是字母，全是数字，全是特殊字符，左边界值，右边界值,中文)
+   反向值(长度符合其他不符合，其他符合长度小于边界，其他符合长度大于边界)
+
+   调用方式：
+    #传参规则，前面第1个参数必须为长度，有中文必须在第2个参数填入chinese,没有则可不填
+    """
+    长度传入规则:必须在第一个参数，有范围输入“开始值-结束值”（如2-20）；无开始值，直接输入“结束值”（如20）
+    中文传入规则：必须在第二个参数，写入"chinese"
+    字符串：输入string
+    整数：int
+    其他可以包含的值：直接输入要包含的值
+    
+    """
+    from randmom_value import get_randomdata
+
+    resuLt = get_randomdata.get_random('2-10','chinese','string','int','_@')
+    result = get_randomdata.get_random('2-20','string','int','_@')
+    result = get_randomdata.get_random('2-20', 'string',)
+    result = get_randomdata.get_random('2-20', 'int',)
+    result = get_randomdata.get_random('2-20',  '_@')
+    result = get_randomdata.get_random('2-20', 'string',  '_@')
+    result = get_randomdata.get_random('2-20', 'int', '_@')
+    

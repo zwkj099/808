@@ -1,0 +1,8 @@
+文件说明：
+weijin.py:经纬度转换
+hbase.py:连接hbase并通过simcard号查询最后一条数据，返回最后一条数据
+comparison.py:将hbase数据与上传的数据进行对比，打印对比错误的数据、正确的数据
+
+调用方式：
+from Applet.Hbase_connect import Comparison
+Comparison.data_comparison(mobile, pdict, ex808dict, sensordict)

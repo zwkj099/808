@@ -1,0 +1,7 @@
+文件说明：
+cmp_position_808_809.py :将808 0200上传的数据与809转发的数据进行对比，将对比错误的数据打印出来，并返回结果True or False
+    调用举例：rst的值为True or False
+    import cmp_position_808_809
+    rst = cmp_position_808_809.cmp_pos('192.168.24.142','root','zwkj@ZWLBS.com','14875300001','渝M00003')
+
+
