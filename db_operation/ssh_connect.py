@@ -39,4 +39,4 @@ class SSHConnection(object):
 
 
 # obj = SSHConnection('192.168.24.142','root','zwkj@ZWLBS.com',)
-# obj.cmd()
+# obj.connect()
