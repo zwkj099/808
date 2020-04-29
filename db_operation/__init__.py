@@ -6,7 +6,7 @@ Created on 2019��8��19��
 @author: admin
 '''
 import interface_db
-import getdb_value
+
 # __all__ = ['os', 'sys', 're', 'urllib']
 
 __version__ = '3.3'

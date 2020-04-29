@@ -6,17 +6,10 @@ Created on 2019��8��21��
 '''
 import exrex
 
-rslist = ['(a|b){2}', '[ab][cd]','a|ab','[0-2]','(foo|bar)(20|)16','[12]{1,2}','((hai){2}|world)!','[ab]{1,3}','\d', \
-      'a[b]?(c){0,1}','(a(b(c(d(e(f))))))','(a(b(c(d(e(f){1,2}))))){1,2}','[^a]','[^asdf]','asdf','(as|df)', \
-      '[áíő]','(a|b)(1|2)\\1\\2\\1\\2','(?=x)','\\da{2}']
-print exrex.getone('[^ab]{0}')
-#
-# print exrex.getone('[a-z]{1,20}')
-# for i in range(10):
-#     print exrex.getone('[^(a-z0-9)]{1,10}')
-
 #args规则:1-2|^0 如1-2位不能为0
 def get_random(*args ):
+
+    #获取长度的开始值、结束值
     if args[0].find('-')!=-1:
         start,end = args[0].split('-')
     else:
@@ -28,7 +21,8 @@ def get_random(*args ):
     res2=''
     res3=''
     chinesevalue = ''
-    
+
+    #有中文，自动生成最大长度的汉字
     if args[1]=='chinese':
         startpos = 2
         import random
@@ -97,21 +91,30 @@ def get_random(*args ):
     if chinesevalue!='':
         Forward_list.append(chinesevalue)
     
-    print chinesevalue   
+    print chinesevalue
+
     return [Forward_list, boundary_list]
 
-if __name__ == '__main__':
-    
-    print exrex.getone('[A-Za-z0-9_\-\u4e00-\u9fa5]+')
-    
-    #传参规则，前面两位必须为长度，有中文必须在第2个参数填入chinese,没有则可不填
-    a = get_random('2-10','chinese','string','int','_@')
-#     a = get_random('2-20','string','int','_@')
-    # a = get_random('2-20', 'string',)
-    # a = get_random('2-20', 'int',)
-    # a = get_random('2-20',  '_@')
-    # a = get_random('2-20', 'string',  '_@')
-    # a = get_random('2-20', 'int', '_@')
-    print "正向值(长度在中间的值，全是字母，全是数字，全是特殊字符，左边界值，右边界值,中文)+反向值(长度符合其他" \
-          "不符合，其他符合长度小于边界，其他符合长度大于边界)：\n"
-    print a
+# if __name__ == '__main__':
+#
+#     print exrex.getone('[A-Za-z0-9_\-\u4e00-\u9fa5]+')
+#
+#     #传参规则，前面第1个参数必须为长度，有中文必须在第2个参数填入chinese,没有则可不填
+#     """
+#     长度传入规则:必须在第一个参数，有范围输入“开始值-结束值”（如2-20）；无开始值，直接输入“结束值”（如20）
+#     中文传入规则：必须在第二个参数，写入"chinese"
+#     字符串：输入string
+#     整数：int
+#     其他可以包含的值：直接输入要包含的值
+#
+#     """
+#     a = get_random('2-10','chinese','string','int','_@')
+# #     a = get_random('2-20','string','int','_@')
+#     # a = get_random('2-20', 'string',)
+#     # a = get_random('2-20', 'int',)
+#     # a = get_random('2-20',  '_@')
+#     # a = get_random('2-20', 'string',  '_@')
+#     # a = get_random('2-20', 'int', '_@')
+#     print "正向值(长度在中间的值，全是字母，全是数字，全是特殊字符，左边界值，右边界值,中文)+反向值(长度符合其他" \
+#           "不符合，其他符合长度小于边界，其他符合长度大于边界)：\n"
+#     print a

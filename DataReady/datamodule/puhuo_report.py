@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import xlrd
-import xlrd
-import time
-import testlibrary
 import re
-import datetime
-import reply
+
+import xlrd
+
+import testlibrary
+from Applet.redis_operation import setMileage
+from comman import upload_location
 from config import readconfig
-from comman import upload_location, reply_position,setMileage
+
 readcig = readconfig()
 tp = testlibrary.testlibrary()
 

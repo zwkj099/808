@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 # 应答脚本
-import time
-import threading
-import thread
-import testlibrary
-import random
-import re
 import datetime
+import re
+import threading
+import time
+
 import reply
-from config import readconfig
-import db_operation
-from comman import buchuan1, upload_location, reply_position,setMileage
-from auto_test import auto_test
+import testlibrary
+from Automation.AppManager.auto_test import auto_test
+
+print "ok"
 from DataReady import dataready_test
-from db_operation import getdb_value
+from comman import buchuan1, upload_location, reply_position
+from config import readconfig
+from Applet.redis_operation import getdb_value,setMileage
+from Applet.mysql_operation import  getmysql_vehicleid
+
 tp = testlibrary.testlibrary()
 readcig = readconfig()
 
@@ -67,16 +69,16 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     tp.send_data(link, drivers)
 
 
-    #设置redis里程，传入车辆id，公共参数ex808dict
-    # vehicle_id = '17aef77b-f9f9-42d9-a96c-60ffb2902a4d'
+    # #设置redis里程，传入车辆id，公共参数ex808dict
+    # vehicle_id = getmysql_vehicleid.get_vehicleid('192.168.24.142'  ,'root' ,'Zwkj@123Mysql' ,'clbs',vnum)
+    # print vehicle_id
     # setMileage.setto_redismel(vehicle_id,ex808dict,pdict['redishost'],pdict['db'],pdict['pwd'])
     # print "redis mel: "+str(ex808dict['mel'])
 
     #获取redis15分区namespace　GROUPINFO－>10000下的数据
-    rd=getdb_value.get_15partition_keys( '192.168.24.105', 15, pdict['pwd'],'GROUPINFO:10000:53552631119085568')
+    rd= getdb_value.get_15partition_keys('192.168.24.105', 15, pdict['pwd'], 'GROUPINFO:10000:53552631119085568')
     print rd
-    #数据库操作
-    # dbop = db_operation.interface_db.interface_db()
+    #数据库操作    # dbop = db_operation.interface_db.interface_db()
     # print dbop.mysqldata('select * from paas_monitorInfo')
 
     auto = 0;  # 是否要跑自动化脚本？
