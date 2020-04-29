@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
-#应答脚本
-import time
-import threading
-import thread
-import testlibrary
-import random
 import re
+# 应答脚本
+import time
+
+import testlibrary
+
 tp=testlibrary.testlibrary()
 import application
+# from Automation.AppManager import application
 from selenium import webdriver
 app = application.application()
 import win32api
@@ -26,7 +26,7 @@ testinfo           = {}
 def readtestfile():
     from xml.dom import minidom
     try:
-        testfile = "./appconfig/testconfig.xml"
+        testfile = "./Automation/AppManager/appconfig/testconfig.xml"
         dom = minidom.parse(testfile)
         tmp = dom.getElementsByTagName("TestList")
         if tmp != []:
@@ -99,14 +99,15 @@ def __logtofile(__logfile,buf):
 
 def auto_test(tp,link,mobile,vnum):
 
-    browser = webdriver.Chrome()
+    # browser = webdriver.Chrome()
+    browser = webdriver.Firefox()
     url='http://192.168.24.142:8080/clbs/login'
     #登录网页
     __logname =time.strftime("%Y/%m/%d %X", time.localtime()).replace("/","_").replace(":","_")+".log"#'2019_07_17 17_44_25'
     __logfile = None
     __logfile=__createlogfile(__logname,__logfile)
 
-    username='Lily'
+    username='ydy'
     password='123456'
     app.login(url,browser,username,password)
     __logtofile(__logfile, "login success!\nusername:"+username+"\nurl:"+url+"\n")
@@ -126,8 +127,11 @@ def auto_test(tp,link,mobile,vnum):
             __logtofile(__logfile,"***********************************************************************************************\n\
 ************************************"+filename+" "+str(__func[test].__name__)+".py*****************************************\n\
 ***********************************************************************************************\n")
+            try:
+                __func[test].main(browser,__argslist[test],testinfo,tp,link,app,mobile,vnum,__logfile,__logtofile)
+            except Exception as e:
+                print e
 
-            __func[test].main(browser,__argslist[test],testinfo,tp,link,app,mobile,vnum,__logfile,__logtofile)
     except TAException.taexception, errobj:
         testresult      = "FAIL"
         __logtofile(__logfile,errobj.errmsg)
