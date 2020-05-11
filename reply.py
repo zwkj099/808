@@ -38,11 +38,6 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
         """
         rlist = ["8104","8103","8106", "8107","8201", "8900", "8001","8801"]
         if id not in rlist:
-            # # reno = "02"
-            # if id =="8300":
-            #     pass
-            # else:
-
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)
@@ -78,6 +73,12 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
         elif id == "8106":
             search_body = get_loadres_body(tp,res,answer_number,version)
             search_head = tp.data_head(mobile, 260, search_body, 5,version)
+            search_data = tp.add_all(search_head + search_body)
+            tp.send_data(link, search_data)
+        # 平台下发指令8105，远程升级
+        elif id == "8105":
+            search_body = get_update_result(tp,id,res,answer_number,version)
+            search_head = tp.data_head(mobile, 264, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
             tp.send_data(link, search_data)
         # 平台下发指令8104，查询全部终端参数
@@ -243,7 +244,13 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
 def get_usyal_body(id,ac,reno="00"):
     body=ac+id+reno
     return body
-
+def get_update_result(tp,id,data,answer_number,version):
+    if version ==1:
+        body=data[38:-4]
+    elif version==0:
+        body = data[28:-4]
+    da=answer_number+id +"00"+"00"+"00"
+    return da
 #组装读取指令应答body
 def get_loadres_body(tp,data,answer_number,version):
     #取得参数总数（可用于校验，未实现）
@@ -283,6 +290,27 @@ def get_loadres_body(tp,data,answer_number,version):
             da=id+"0A01000201030204030600"
         elif id == "0000F906":
             da=id+"070A000102030000000000000A00010203000000000000"
+        elif id == "0000F2E1" or id =="0000F2E2"  or id =="0000F2E3" or id =="0000F2E4":
+            #中位标准：读取主动安全外设基本信息
+            gsmc="gongsimingcheng"
+            cpdm="31313839"
+            yjbb="312E312E38"
+            rjbb="36362E382E30"
+            sbID="3132333435363738"
+            khdm="99898798"
+            da=id + len(gsmc)/2+gsmc+ len(cpdm)/2+cpdm+ len(yjbb)/2+yjbb+ len(rjbb)+rjbb+ len(sbID)+sbID+ len(khdm)+khdm
+        elif id == "0000F2E7":
+            #中位标准：查询终端路网地图信息
+            dtbb="312E362E39"
+            da = id +"3032333536"+ len(dtbb)/2+dtbb
+
+        elif id == "0000F1E1" or id == "0000F1E2" or id == "0000F1E3" or id == "0000F1E4" :
+            #中位标准：查询外设状态信息
+            da= id +"01"+"00000000"
+        elif id == "0000F0E1" or id == "0000F0E2" or id == "0000F0E3" or id == "0000F0E4" or id == "0000F0E5":
+            # 中位标准：读取外设参数设置(使用下发的参数）
+            da=id+ "545454"
+
         elif id == "0000F641":#油量标定数组
             da=id+"75000000CA0000005B00000194000000B70000025E00000112000003280000016D000003F2000001C9000004BC00000224000005860000027F00000650000002DA0000071A00000336000007E400000391000008AE000003EC000009780000044800000A42000004A300000B0C000004FE00000BD60000055A00000CA0000005B500000D6A0000061000000E340000066C00000EFE000006C700000FC800000722FFFFFFFFFFFFFFFF247E"
         # 高精度硬件参数读取0X4F（电量检测）和0x50（终端信息检测），按0X4F0和x50设置的协议格式上传
