@@ -1,0 +1,14 @@
+文件说明：
+cmp_position_808_809.py :将808 0200上传的数据与809转发的json数据进行对比，将对比错误的数据打印出来，并返回结果True or False
+    调用举例：rst的值为True or False
+    import cmp_position_808_809
+    rst = cmp_position_808_809.cmp_pos('192.168.24.142','root','zwkj@ZWLBS.com','14875300001','渝M00003')
+
+ cmp_position_origin.py:将808 0200上传的数据与809转发的原始数据进行对比，将对比错误的数据打印出来，并返回结果True or False
+    调用举例：rst的值为True or False
+    import cmp_position_808_809
+    rst = cmp_position_origin.cmp_pos('192.168.24.142','root','zwkj@ZWLBS.com','14875300001','30 30 30 30 33')
+    注意:最后一个参数为车牌号的十六进制形式的部分内容，如渝M00003的十六进制为：D3 E5 4D 30 30 30 30 33 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+
+

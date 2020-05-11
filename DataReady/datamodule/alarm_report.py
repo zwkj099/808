@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import xlrd
-from comman import upload_location, reply_position,setMileage
+
+from Applet.redis_operation import setMileage
+from comman import upload_location
 from config import readconfig
 
 readcig = readconfig()

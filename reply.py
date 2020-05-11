@@ -21,7 +21,7 @@ from comman import upload_location
 
 def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
     try:
-        #reno = "00"
+        # reno = "01"
         """
         x += 1
         if x%5==1:
@@ -38,6 +38,11 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
         """
         rlist = ["8104","8103","8106", "8107","8201", "8900", "8001","8801"]
         if id not in rlist:
+            # # reno = "02"
+            # if id =="8300":
+            #     pass
+            # else:
+
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
             usual_redata = tp.add_all(usual_head + usual_body)

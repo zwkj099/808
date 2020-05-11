@@ -1,0 +1,38 @@
+文件说明：
+mysql_connect.py:连接数据库,可以查询数据
+post_bug.py:新增、修改jira上的bug
+
+    """
+    :param username:用户名
+    :param password:登录密码
+    :param project:项目名称
+    :param status:状态 0：新增 1：待观察 2：重启 3：关闭 4：延后  5：拒绝  6：修改
+    :param issueid:bug编号 如LYXJ-789
+    :param priority:优先级 1：紧急 2：高 3：中 4：一般 5：低  10000：N/A
+    :param assignee:经办人 请参考jira_user.csv文件
+    :param summary:概要
+    :param description:描述
+    :param components:模块
+    :param customfield:bug分类  需求类、功能类、前端界面类、性能类、安全类、接口、易用性、安装部署/配置类
+    :param customfield_10303:严重程度  致命、严重、一般、轻微
+    :return:
+    """
+
+调用方式：
+
+    bugid=postbug(用户名，密码，项目名称，状态，bug编号，优先级，经办人，概要，描述，模块，bug分类，严重程度）
+    新增时：状态，bug编号分别传入0,0，其他项必填
+    待观察、重庆、关闭、延后、拒绝：只需传入用户名、密码、项目名称、状态、bug编号
+    修改：所有的值都需要传入
+
+
+    举例：
+    bugid = postbug('yangdanyuan','123456','林业巡检',0,0,priority='3',assignee='yangdanyuan',summary='概要post',description='描述内容',components='监控调度',customfield='前端界面类',customfield_10303='严重')#新增，返回bug编号，如LYXJ-793
+    print bugid
+    status_code = postbug('yangdanyuan','123456','林业巡检', 1, 'LYXJ-786')#待观察       成功200
+    status_code=postbug('yangdanyuan','123456','林业巡检', 2, 'LYXJ-809')#重启
+    status_code=postbug('yangdanyuan','123456','林业巡检', 3, 'LYXJ-793')#关闭
+    status_code=postbug('yangdanyuan','123456','林业巡检', 4, 'LYXJ-793')#延后
+    status_code= postbug('yangdanyuan','123456','林业巡检', 5, 'LYXJ-793')#拒绝
+    status_code=postbug('yangdanyuan','123456','林业巡检',6,'LYXJ-809',priority='3',assignee='ailili',summary='概要post-modify',description='描述内容-modify',components='监控调度',customfield='功能类',customfield_10303='一般')#修改
+

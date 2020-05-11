@@ -1,0 +1,2 @@
+文件说明：
+getmysql_vehicleid.py:通过监控对象名称去获取mysql中车辆id
