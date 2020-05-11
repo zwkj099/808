@@ -159,6 +159,9 @@ class mytool(object):
                 # body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type)
                 body = self.add_zdaq(id, pdict,sichuandict,deviceid,port)
                 ZDAQ_body += body
+            elif id in (225,226,227,228,229,231):
+                body = self.add_ZW_zdaq(id)#zdaq(id, pdict, sichuandict, deviceid, port)
+                ZDAQ_body += body
             else:
                 print "无主动安全数据"
         return ZDAQ_body
@@ -177,6 +180,7 @@ class mytool(object):
                     :param lcs: 里程相关参数
                     :param return:返回F3附加信息
                     '''
+        """数据格式：附加消息ID（b)+附加信息长度(b)+外设传感器总数(b)+  外设ID1(b)+外设消息长度(b)+外设消息内容(bn)+外设ID2(b)......  ;附加消息ID:如F3"""
 
         data = ""
         data0 = ""
@@ -291,7 +295,7 @@ class mytool(object):
         return data
 
     # def add_zdaq(self,id,sign,event,level,deviate,road_sign,fatigue,jin, wei, high, speed,zstatus,deviceid,attach_Count,port=6975,tire_num=0,tire_loc=0,tire_alarm_type=40,tire_pressure=3,tire_temp=35,tire_electric=50):
-    def add_zdaq(self, id, pdict,sichuandict,deviceid,port,tire_pressure=3,tire_temp=35,tire_electric=50):
+    def add_zdaq(self, id, pdict,sichuandict,deviceid,port,tire_pressure=3,tire_temp=35,tire_electric=50,mobile='00000000013300000048'):
         ''' 川冀标主动安全数据
         :param id: 外设ID（100、101、102、103、112、113）
         :param port:监控对象协议对应端口号
@@ -364,6 +368,27 @@ class mytool(object):
         zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
         return zddata
 
+    def add_ZW_zdaq(self, id,mobile='00000000013300000048'):# pdict, sichuandict, deviceid, port, tire_pressure=3, tire_temp=35, tire_electric=50,):
+        alarmID = "00000001"  # 报警ＩＤ（DWORD)
+        if id==225:#前向监测系统,225-231
+            data = alarmID + "00000001020202020201"+mobile+"E100"+"200428120555"+"010100"
+        elif id==226:#前向监测系统
+            data = alarmID + "00000001020201"+mobile+"E100"+"200428120555"+"010100"
+        elif id == 227:  # 轮胎气压监测系
+            data = "01000001" + "0001000100020200"
+        elif id == 228:  # 盲区监测系统
+            data = "000101" + mobile + "0000" + "200428120555" + "010200"
+        elif id == 229:  #原车数据;      正常情况下只用0xE5，如果数据字节数超过255个字节，则后续数据流值放在附加信息0xE6中(229-230)
+            data = "0001"+"0647"+"01"
+        elif id == 231:  # 终端分析上报
+            data = "0178786500000000"
+        else:
+            print "无中位标准主动安全数据",id
+            data=""
+        lent = len(data) / 2
+        # 组装为信息并返回
+        ZW_zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
+        return ZW_zddata
     def extra_info(self, ids=None, ex808dict=None): #vedio_alarm=0, vedio_signal=0, memery=0, abnormal_driving=0, meilage=0, oil=0,speed=0, by=0, wn=None):
         """# 组装附加信息"""
 
@@ -530,19 +555,6 @@ class mytool(object):
             f3data="F" + str(c)+jctool.to_hex(lent,2)+jctool.to_hex(num,2)+data_body #组装为f3信息
         return f3data
 
-    def add_cb_data(self,id,data_body):
-        '''组装四川标准主动安全信息
-        组合附加信息，把各个传感器信息打包成f3附加信息
-        :param id:外设ID
-        :param data_body: 外设信息body
-        :return: 附加信息
-        '''
-        #计算附加消息长度
-        lent=len(data_body)/2+1
-        #组装为cb信息并返回
-        cbdata=jctool.to_hex(id,2)+jctool.to_hex(lent,2)+data_body
-        return cbdata
-
     def add_jz(self,dm,dbm):
         '''基站定位
         :param dm: 定位模式，0-4
@@ -569,6 +581,9 @@ class mytool(object):
         else:
             wa="00000000"
         temp=float(temp)*10
+        """
+        13版和19版本相同：{外设ID+}　数据长度（b)+重要数据标识(b)+温度值(b3)+超出阈值持续时间(DWORD)+高低温报警(DWORD)
+        """
         data=jctool.to_hex(id,2)+"0C"+jctool.to_hex(sign,2)+jctool.to_hex(temp,6)+jctool.to_hex(times,8)+wa
         return data
 
@@ -589,6 +604,9 @@ class mytool(object):
         else:
             wa="00000000"
         hum=float(hum)*10
+        """
+        13版和19版本相同：{外设ID+}　数据长度（b)+重要数据标识(b)+湿度值(b3)+超出阈值持续时间(DWORD)+湿度报警(DWORD)
+        """
         data=jctool.to_hex(id,2)+"0C"+jctool.to_hex(sign,2)+jctool.to_hex(hum,6)+jctool.to_hex(times,8)+wa
         return data
 
@@ -613,6 +631,9 @@ class mytool(object):
         seep=float(seep)*10
         all=float(all)*10
         ratio=float(ratio)*1000
+        """
+        13版和19版本相同：{外设ID+}数据长度（b)+重要数据标识(b)+AD值(b3)+液体温度(DWORD)+环境温度(DWORD)+加油量(DWORD)+漏油量(DWORD)+液体量(DWORD)+液位百分比(DWORD)+液位高度(DWORD)
+        """
         data=jctool.to_hex(id,2)+"20"+jctool.to_hex(sign,2)+jctool.to_hex(high_AD,6)+jctool.to_hex(temp1,8)+\
              jctool.to_hex(temp2,8)+jctool.to_hex(add,8)+jctool.to_hex(seep,8)+jctool.to_hex(all,8)+\
             jctool.to_hex(ratio,8)+jctool.to_hex(high,8)
