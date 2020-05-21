@@ -70,8 +70,8 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
 
 
     #设置redis里程，传入车辆id，公共参数ex808dict
-    #vehicle_id = getmysql_vehicleid.get_vehicleid('192.168.24.142'  ,'root' ,'Zwkj@123Mysql' ,'clbs',vnum)
-    # print vehicle_id
+    vehicle_id = getmysql_vehicleid.get_vehicleid('192.168.24.142'  ,'root' ,'Zwkj@123Mysql' ,'clbs',vnum)
+    print vehicle_id
     # setMileage.setto_redismel(vehicle_id,ex808dict,pdict['redishost'],pdict['db'],pdict['pwd'])
     # print "redis mel: "+str(ex808dict['mel'])
 
@@ -85,12 +85,12 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     aa=1
     if auto == 1:  # auto == 1，则要跑自动化脚本
         auto_test(tp, link, mobile, vnum)
-    elif (pdict['ti'] != 0):  # 是否要补传数据；pdict['ti'] != 0补传，pdict['ti'] = 0不补传
+    elif (pdict['ti'] != 0):  # 补传数据
         wsid1 = []
         wsid1,excel_list_k=buchuan1.deal_data(pdict, sichuandict, ex808dict, sensordict,bluetoothdict,wsid1,i)#读取excel表格数据，改变速度、初始里程、报警事件
         buchuan1.upload(tp, link, mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id, idlist, wsid1,excel_list_k,deviceid,port,tal)
 
-    elif aa==0:  #数据准备，也要根据情况设置extrainfo_id,idlist ,wsid，该绑定传感器的要到平台绑定传感器
+    elif aa==1:  #数据准备，也要根据情况设置extrainfo_id,idlist ,wsid，该绑定传感器的要到平台绑定传感器
         print "数据准备开始"
         dataready_test.datatest(tp, link, mobile, extrainfo_id, idlist, wsid,deviceid,port,vehicle_id)
         print "准备数据完成"
@@ -153,6 +153,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                         answer_number = res[32:36]
                     reno = "00"
                     if id in ["8201", "8202","8802","8500"]:
+                        # reply_position.reply_pos(tp, link, mobile, pdict, ex808dict, sensordict, info, extrainfo_id,idlist, wsid, answer_number, res, id, reno)
                         reply_position.reply_pos(tp, link, mobile, pdict,sichuandict, ex808dict, sensordict,bluetoothdict, extrainfo_id,
                                                  idlist, wsid,  deviceid, port,answer_number, res, id, reno)
 
@@ -210,7 +211,7 @@ thread_list = []
 for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
     t.start()
-#    deviceid += 1
+    deviceid += 1
     mobile += 1
     qualification += 1
     cont += 1
