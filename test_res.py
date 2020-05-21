@@ -49,7 +49,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
 
    #上传wifi数据时，必须同时上传基站数据，上传基站数据，0200状态要为未定位
     idlist = [8,9,33,34,35,36,37,38,39,40,41,65,66,67,68,69,70,79,80,81,83,84,112,128]  # [34, 39, 65,69,79,80,81,83,112,128],传入需要组装的传感器ID，十进制数；33,34,35,36,37:温度；38,39,40,41:湿度；65,66,67,68:油量、液位；69,70:油耗；79:电量检测,80:终端检测；81:正反转；83:里程；84:蓝牙信标；112,113:载重；128,129:工时；8：基站数据；8、9：wifi数据
-    wsid = [100,101,112,102,103,113]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
+    wsid = [225]  # 上传的主动安全报警类型，（冀标只有100和101）；0: 表示不带主动安全数据；100：驾驶辅助功能报警信息；101：驾驶员行为监测功能报警信息；112：激烈驾驶报警信息；102：轮胎状态监测报警信息；103：盲区监测报警信息；113：卫星定位系统报警信息；川冀标切换只需改端口；
 
     link = tp.tcp_link(ip, port)
     # 注册、鉴权、心跳
@@ -82,7 +82,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     # print dbop.mysqldata('select * from paas_monitorInfo')
 
     auto = 0;  # 是否要跑自动化脚本？
-    aa=1
+    aa=0
     if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
     elif (pdict['ti'] != 0):  # 补传数据
@@ -121,12 +121,14 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                     sichuandict['event'] = 16
                 elif (sichuandict['event'] == 19):
                     sichuandict['event'] = 1
-                    if(wsid[0]==100):
-                        wsid[0]=101
-                    elif (wsid[0] == 101):
-                        wsid[0] = 112
-                    elif(wsid[0]==112):
-                        wsid[0] = 100
+                    if(wsid[0]==225):
+                        wsid[0]=226
+                    elif (wsid[0] == 226):
+                        wsid[0] = 227
+                    elif(wsid[0]==227):
+                        wsid[0] = 228
+                    elif(wsid[0])==228:
+                        wsid[0]==225
                 upload_location.location(tp, link, mobile, pdict, sichuandict, ex808dict, sensordict, bluetoothdict,
                                          extrainfo_id, idlist, wsid, deviceid, port)
                 res = tp.receive_data(link)
@@ -187,12 +189,12 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.143"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
-port = 6994  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标,7002沪标
-deviceid ='B000027' #20190928
-mobile =13200000027 #123456789
-vnum = u"渝B0012"  #桂BB001
+port = 7003  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标,7002沪标
+deviceid ='0002111' #20190928
+mobile =13200222111 #123456789
+vnum = u"渝JTS111"  #桂BB001
 cont = 0
 name = "驾驶员桂A0002"
 qualification = 14303529463400355011

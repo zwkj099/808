@@ -11,11 +11,11 @@ def get_vehicleid(host,user,pwd,db,vnum):
     :return:车辆id
     """
     # 打开数据库连接
-    mysql_test = Mysql(host,3306,user,pwd,db,vnum)
-    sql = "select id from zw_m_vehicle_info where brand ="+"'"+vnum+"'"
-    result = mysql_test.query(sql)
-    # print result[0][0]
-    return result[0][0]
+    # mysql_test = Mysql(host,3306,user,pwd,db,vnum)
+    # sql = "select id from zw_m_vehicle_info where brand ="+"'"+vnum+"'"
+    # result = mysql_test.query(sql)
+    # # print result[0][0]
+    # return result[0][0]
 
 #     for res in result:
 #         print res[0]
