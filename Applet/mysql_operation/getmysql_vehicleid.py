@@ -14,8 +14,10 @@ def get_vehicleid(host,user,pwd,db,vnum):
     mysql_test = Mysql(host,3306,user,pwd,db,vnum)
     sql = "select id from zw_m_vehicle_info where brand ="+"'"+vnum+"'"
     result = mysql_test.query(sql)
-    # print result[0][0]
-    return result[0][0]
+    if result!=():#查询到数据
+        return result[0][0]
+    else:#未查询到数据
+        return False
 
 #     for res in result:
 #         print res[0]
