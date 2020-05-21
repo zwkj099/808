@@ -69,9 +69,9 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     tp.send_data(link, drivers)
 
 
-    # #设置redis里程，传入车辆id，公共参数ex808dict
-    # vehicle_id = getmysql_vehicleid.get_vehicleid('192.168.24.142'  ,'root' ,'Zwkj@123Mysql' ,'clbs',vnum)
-    # print vehicle_id
+    #设置redis里程，传入车辆id，公共参数ex808dict
+    vehicle_id = getmysql_vehicleid.get_vehicleid('192.168.24.142'  ,'root' ,'Zwkj@123Mysql' ,'clbs',vnum)
+    print vehicle_id
     # setMileage.setto_redismel(vehicle_id,ex808dict,pdict['redishost'],pdict['db'],pdict['pwd'])
     # print "redis mel: "+str(ex808dict['mel'])
 
@@ -82,7 +82,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     # print dbop.mysqldata('select * from paas_monitorInfo')
 
     auto = 0;  # 是否要跑自动化脚本？
-    aa=0
+    aa=1
     if auto == 1:  # 是否要跑自动化脚本？
         auto_test(tp, link, mobile, vnum)
     elif (pdict['ti'] != 0):  # 补传数据
