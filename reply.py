@@ -74,6 +74,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             search_body = get_loadres_body(tp,res,answer_number,version)
             search_head = tp.data_head(mobile, 260, search_body, 5,version)
             search_data = tp.add_all(search_head + search_body)
+            print "send 0104"
             tp.send_data(link, search_data)
         # 平台下发指令8105，远程升级
         elif id == "8105":
@@ -294,17 +295,21 @@ def get_loadres_body(tp,data,answer_number,version):
         #中位主动安全协议应答
         elif id == "0000F2E1" or id =="0000F2E2"  or id =="0000F2E3" or id =="0000F2E4":
             #中位标准：读取主动安全外设基本信息
-            gsmc="gongsimingcheng"
-            cpdm="31313839"
-            yjbb="312E312E38"
-            rjbb="36362E382E30"
-            sbID="3132333435363738"
-            khdm="99898798"
-            da=id + len(gsmc)/2+gsmc+ len(cpdm)/2+cpdm+ len(yjbb)/2+yjbb+ len(rjbb)+rjbb+ len(sbID)+sbID+ len(khdm)+khdm
+            corporate_name = "5030303031"#公司名称
+            product_code = "31313839"#产品代码
+            hw_version = "312E312E38"#硬件版本
+            SW_version = "36362E382E30"#软件版本
+            device_ID = "3132333435363738"#设备ＩＤ
+            customer_code = "99898798"#客户代码
+            data_content=tp.to_hex(len(corporate_name) / 2, 2) + corporate_name + tp.to_hex(len(product_code) / 2, 2) + product_code + \
+                         tp.to_hex(len(hw_version) / 2,2) + hw_version + tp.to_hex(len(SW_version) / 2, 2) + SW_version + \
+                         tp.to_hex(len(device_ID) / 2, 2) + device_ID + tp.to_hex(len(customer_code) / 2, 2) + customer_code
+            da=id +tp.to_hex(len(data_content) / 2, 2)+data_content
         elif id == "0000F2E7":
             #中位标准：查询终端路网地图信息
-            dtbb="312E362E39"
-            da = id +"3032333536"+ len(dtbb)/2+dtbb
+            dtbb="5030303031"
+            dat="3032333536" + tp.to_hex(len(dtbb) / 2, 2) + dtbb
+            da = id +tp.to_hex(len(dat) / 2, 2)+dat
         elif id == "0000F1E1" or id == "0000F1E2" or id == "0000F1E3" or id == "0000F1E4" :
             #中位标准：查询外设状态信息
             da= id +"01"+"00000000"
