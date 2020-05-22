@@ -15,7 +15,7 @@ from comman import buchuan1, upload_location, reply_position
 from config import readconfig
 from Applet.redis_operation import getdb_value,setMileage
 from Applet.mysql_operation import  getmysql_vehicleid
-
+import thread
 tp = testlibrary.testlibrary()
 readcig = readconfig()
 
@@ -56,8 +56,13 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     upload_location.initial(tp, link, deviceid, vnum, mobile, pdict['version'])
 
     tal = int(tal)+30
-    date = datetime.datetime.strptime(pdict['detester'], "%Y-%m-%d %H:%M:%S")
-    time1 = (date + datetime.timedelta(seconds=int(tal))).strftime("%y%m%d%H%M%S")
+    time1=''
+    c = threading.RLock()
+    def f():
+        with c:
+            date = datetime.datetime.strptime(pdict['detester'],
+                                              "%Y-%m-%d %H:%M:%S")  # _strptime方法不支持多线程，运行时会报错：AttributeError: _strptime
+            time1 = (date + datetime.timedelta(seconds=int(tal))).strftime("%y%m%d%H%M%S")
 
     # 发送驾驶员信息
     statu = 1 #0x01：从业资格证 IC 卡插入（驾驶员上班）； 0x02：从业资格证 IC 卡拔出（驾驶员下班）
@@ -82,7 +87,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
     # print dbop.mysqldata('select * from paas_monitorInfo')
 
     auto = 0;  # 为0不跑自动化脚本，为１要跑自动化脚本
-    aa=1
+    aa=0
     if auto == 1:  # auto == 1，则要跑自动化脚本
         auto_test(tp, link, mobile, vnum)
     elif (pdict['ti'] != 0):  # 补传数据
@@ -196,20 +201,20 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.143"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
 port = 7003  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标,7002沪标；7003中位标准
-deviceid ='1545125' #20190928
-mobile =15897874541 #123456789
+deviceid =2555 #20190928
+mobile =13200222555 #123456789
 vnum = u"测JTS882"  #桂BB001
 cont = 0
 name = "驾驶员桂A0002"
 qualification = 14303529463400355011
 
-tal=0
+tal=0 #用于补传数据，多个监控对象时，每隔一个小时上传一个监控对象的补传数据
 thread_list = []
 for i in range(0, 1):
-    t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
+    t = threading.Thread(target=test1, args=(ip, port, mobile,deviceid, vnum, name, qualification,i,tal))
     t.start()
     deviceid += 1
     mobile += 1
