@@ -15,7 +15,7 @@ from comman import buchuan1, upload_location, reply_position
 from config import readconfig
 from Applet.redis_operation import getdb_value,setMileage
 from Applet.mysql_operation import  getmysql_vehicleid
-
+import thread
 tp = testlibrary.testlibrary()
 readcig = readconfig()
 
@@ -121,14 +121,12 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                     sichuandict['event'] = 16
                 elif (sichuandict['event'] == 19):
                     sichuandict['event'] = 1
-                    if(wsid[0]==225):
-                        wsid[0]=226
-                    elif (wsid[0] == 226):
-                        wsid[0] = 227
-                    elif(wsid[0]==227):
-                        wsid[0] = 228
-                    elif(wsid[0])==228:
-                        wsid[0]==225
+                    if(wsid[0]==100):
+                        wsid[0]=101
+                    elif (wsid[0] == 101):
+                        wsid[0] = 112
+                    elif(wsid[0]==112):
+                        wsid[0] = 100
                 upload_location.location(tp, link, mobile, pdict, sichuandict, ex808dict, sensordict, bluetoothdict,
                                          extrainfo_id, idlist, wsid, deviceid, port)
                 res = tp.receive_data(link)
@@ -189,17 +187,17 @@ def ano_res(res):
     return re_list
 
 # 设置接入ip
-ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
+ip = "192.168.24.143"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 # ip="zoomwell.cn"
 port = 7003  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标,7002沪标
-deviceid ='0002555' #20190928
-mobile =13200222555 #123456789
-vnum = u"渝JTS555"  #桂BB001
+deviceid ='0002111' #20190928
+mobile =13200222111 #123456789
+vnum = u"渝JTS111"  #桂BB001
 cont = 0
 name = "驾驶员桂A0002"
 qualification = 14303529463400355011
 
-tal=0
+tal=0 #用于补传数据，多个监控对象时，每隔一个小时上传一个监控对象的补传数据
 thread_list = []
 for i in range(0, 1):
     t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
