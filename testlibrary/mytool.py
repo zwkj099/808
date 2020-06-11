@@ -370,20 +370,20 @@ class mytool(object):
 
     def add_ZW_zdaq(self, id,mobile='00000000013300000048'):# pdict, sichuandict, deviceid, port, tire_pressure=3, tire_temp=35, tire_electric=50,):
         alarmID = "00000001"  # 报警ＩＤ（DWORD)
-        alarmType = ['00000001','00000002','00000004','00000008','00000010','00000020','00000040','00000080','00000100','00000200','00020000','00040000']
+        alarmType = ['00000001','00000002','00000004','00000008','00000016','00000032','00000064','00000128','00000256','00000512','00131072','00262144']
         alarmTypeb = ['E100','E101','E102','E103','E104','E105','E106','E107','E108','E109','E117','E118']
-        alarmType1 = ['00000001','00000002','00000004','00000008','00000010','00000020','00000040','00000080','00020000','00040000','00080000']
+        alarmType1 = ['00000001','00000002','00000004','00000008','00000016','00000032','00000064','00000128','00131072','00262144','00524288']
         alarmTypeb1 = ['E200','E201','E202','E203','E204','E205','E206','E207','E217','E218','E219']
         alarmType2 = ['0001','0002','0004']
         alarmTypeb2 = ['E400','E401','E402']
-        alarmTypeb3 = ['01','02','04','08','10','20','40']
+        alarmTypeb3 = ['01','02','04','08','16','32','64']
         ti = time.strftime("%y%m%d%H%M%S", time.localtime())
         if id==225:#前向监测系统,225-231
             # i = random.randint(0,11)
-            data = alarmID + alarmType[0] + "020202020201"+mobile+ alarmTypeb[0] +ti+"010100"
+            data = alarmID + alarmType[0] + "020202020201"+mobile+ alarmTypeb[0] + ti +"010100"
         elif id==226:#前向监测系统
             j = random.randint(0,10)
-            data = alarmID +alarmType1[j] + "020201"+mobile+alarmTypeb1[j]+ti+"010100"
+            data = alarmID +alarmType1[j] + "020201"+mobile+alarmTypeb1[j]+ ti +"010100"
         elif id == 227:  # 轮胎气压监测系
             m = random.randint(0,6)
             data = "01000001" + "00" + alarmTypeb3[m]+ "000100020200"

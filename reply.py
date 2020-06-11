@@ -3,11 +3,14 @@
 import time
 import threading
 import thread
-import testlibrary
+from testlibrary import jctool
 import random
+import socket
+import sys
+import struct
 import re
 import datetime
-#tp=testlibrary.testlibrary()
+# tp=testlibrary.testlibrary()
 from comman import upload_location
 
 """
@@ -36,7 +39,7 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
             pass
         print "第%d次应答%s" % (x, reno)
         """
-        rlist = ["8104","8103","8105","8106", "8107","8201", "8900", "8001","8801"]
+        rlist = ["8104","8103","8105","8106", "8107","8201", "8900", "8001","8801","9208"]
         if id not in rlist:
             usual_body = get_usyal_body(id, answer_number, reno)
             usual_head = tp.data_head(mobile, 1, usual_body, 5,version)
@@ -156,6 +159,13 @@ def reply(tp,link,res,mobile,id,answer_number, reno,version=0):
                     usual_head = tp.data_head(mobile, 2304, usual_body, 5,version)
                     result = tp.add_all(usual_head + usual_body)
                     tp.send_data(link, result)
+
+
+
+
+
+
+
          #短信平台私有协议，文本下发
         # elif id=="8300":
         #     tag = res[61:66] #获取下发的标识，确认下发的内容是什么，在进行对应应答
