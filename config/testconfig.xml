@@ -2,7 +2,7 @@
 <TestAutomatiomCfg>
 	<plublicparameters>
 	
-<!-- 	alarm：#报警状态
+<!-- 	alarm：#报警状态 全部报警：2147483647
 	    status：#状态
 	    jin：#经度
 	    wei：#纬度
@@ -15,7 +15,7 @@
 	    messageid: #区分单条位置512和批量位置1796
 	    version: #协议版本标识 version=0时表示2013版808协议，version=1时表示2019版808协议 -->
     
-		<Key>alarm=0</Key>
+		<Key>alarm=537395205</Key>
 		<Key>status=3</Key> <!-- 上传基站数据时，需要是未定位-->
 		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
@@ -82,7 +82,7 @@
 			wn:附加信息－GNSS 定位卫星数
 			temper：附加信息－车箱温度
 		-->
-		<Key>vedio_alarm=127</Key>	
+		<Key>vedio_alarm=0</Key>
 		<Key>vedio_signal=3</Key>
 		<Key>memery=2</Key>
 		<Key>abnormal_driving=4</Key>	

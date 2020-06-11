@@ -370,25 +370,26 @@ class mytool(object):
 
     def add_ZW_zdaq(self, id,mobile='00000000013300000048'):# pdict, sichuandict, deviceid, port, tire_pressure=3, tire_temp=35, tire_electric=50,):
         alarmID = "00000001"  # 报警ＩＤ（DWORD)
-        alarmType = ['00000001','00000002','00000004','00000008','00000016','00000032','00000064','00000128','00000256','00000512','00131072','00262144']
+        alarmType = ['00000001','00000002','00000004','00000008','00000010','00000020','00000040','00000080','00000100','00000200','00020000','00040000']
         alarmTypeb = ['E100','E101','E102','E103','E104','E105','E106','E107','E108','E109','E117','E118']
-        alarmType1 = ['00000001','00000002','00000004','00000008','00000016','00000032','00000064','00000128','00131072','00262144','00524288']
+        alarmType1 = ['00000001','00000002','00000004','00000008','00000010','00000020','00000040','00000080','00020000','00040000','00080000']
         alarmTypeb1 = ['E200','E201','E202','E203','E204','E205','E206','E207','E217','E218','E219']
         alarmType2 = ['0001','0002','0004']
         alarmTypeb2 = ['E400','E401','E402']
-        alarmTypeb3 = ['01','02','04','08','16','32','64']
+        alarmTypeb3 = ['01','02','04','08','10','20','40']
+        ti = time.strftime("%y%m%d%H%M%S", time.localtime())
         if id==225:#前向监测系统,225-231
-            i = random.randint(0,11)
-            data = alarmID + alarmType[i] + "020202020201"+mobile+ alarmTypeb[i] +"200520152020"+"010100"
+            # i = random.randint(0,11)
+            data = alarmID + alarmType[0] + "020202020201"+mobile+ alarmTypeb[0] +ti+"010100"
         elif id==226:#前向监测系统
             j = random.randint(0,10)
-            data = alarmID +alarmType1[j] + "020201"+mobile+alarmTypeb1[j]+"200520152020"+"010100"
+            data = alarmID +alarmType1[j] + "020201"+mobile+alarmTypeb1[j]+ti+"010100"
         elif id == 227:  # 轮胎气压监测系
             m = random.randint(0,6)
             data = "01000001" + "00" + alarmTypeb3[m]+ "000100020200"
         elif id == 228:  # 盲区监测系统
             k = random.randint(0,2)
-            data = alarmType2[k]+"01" + mobile + alarmTypeb2[k] + "200520152020" + "010100"
+            data = alarmType2[k]+"01" + mobile + alarmTypeb2[k] + ti + "010100"
         elif id == 229:  #原车数据;      正常情况下只用0xE5，如果数据字节数超过255个字节，则后续数据流值放在附加信息0xE6中(229-230)
             data = "0001"+"0647"+"01"
         elif id == 231:  # 终端分析上报
