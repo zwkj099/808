@@ -368,7 +368,7 @@ class mytool(object):
         zddata = jctool.to_hex(id, 2) + jctool.to_hex(lent, 2) + data
         return zddata
 
-    def add_ZW_zdaq(self, id,mobile='00000000013300000048'):# pdict, sichuandict, deviceid, port, tire_pressure=3, tire_temp=35, tire_electric=50,):
+    def add_ZW_zdaq(self, id,mobile='00000000013200222555'):# pdict, sichuandict, deviceid, port, tire_pressure=3, tire_temp=35, tire_electric=50,):
         alarmID = "00000001"  # 报警ＩＤ（DWORD)
         alarmType = ['00000001','00000002','00000004','00000008','00000016','00000032','00000064','00000128','00000256','00000512','00131072','00262144']
         alarmTypeb = ['E100','E101','E102','E103','E104','E105','E106','E107','E108','E109','E117','E118']

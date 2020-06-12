@@ -6,7 +6,11 @@ import socket
 import os
 import struct
 
-
+'''
+1、目前文件名是写死的，对应的是前向碰撞报警的文件名称
+2、支持中位协议
+3、使用前需要配置图片路径
+'''
 
 def attach_upload(tp,res,mobile,version):
     if version == 1:
@@ -14,43 +18,49 @@ def attach_upload(tp,res,mobile,version):
             mobile = '0' + mobile
         # iplenth = (int(res[36:38],16))*2 #获取9208指令中服务器地址长度字段
         ip2 = "112.126.64.32"
-        port2 = 7900
-        alarmflag = res[66:108]  # 获取报警标识号
-        alarm_number = res[108:172]
+        port2 = 7901
+        alarmflag = res[68:108]  # 获取报警标识号
+        alarm_number = res[108:174]
         # 文件名（00_e1_e100_0_b87441129fb34ef8969fd0de2739d15e.jpg）转成16进制格式
-
+        #文件名称可修改，文件大小不要大于64kb
         filepath = 'C:\\Users\\zwkj\\Desktop\\00_E1_E100_0_b87441129fb34ef8969fd0de2739d15e.jpg'
+        #filename1为原始文件名，filename转为16进制后的名称
         filename1 = os.path.basename(filepath)
         filename = tp.character_string(filename1)
         filename2 = tp.character_string(filename1,50)
+        #filesize文件大小，filesize1文件大小转为16进制
         filesize = os.stat(filepath).st_size
+        print filesize
         filesize1 = tp.to_hex(filesize,8)
         # filename = '30305F65315F653130305F305F62383734343131323966623334656638393639666430646532373339643135652E6A7067'
 
         filenamelen = str(hex(len(filename) / 2))[2:]  # 文件名长度
 
-        attachlist = filenamelen + filename + '00' + '000044EA'  # 组装附件信息内容
+        attachlist = filenamelen + filename + '00' + filesize1  # 组装附件信息内容
         usual_body = mobile + alarmflag + alarm_number + '00' + '01' + attachlist  # 组装1210指令消息体
         head = tp.data_head(mobile, 4624, usual_body, 5, version)
         redata = tp.add_all(head + usual_body)
 
         link1 = tp.tcp_link(ip2, port2)
         tp.send_data(link1,redata)
-        # tp.receive_data(link1)
-        time.sleep(10)
+        tp.receive_data(link1)
+        # time.sleep(30)
         # 1211指令的消息体跟附件信息内容一样
         fileinfo_head = tp.data_head(mobile, 4625, attachlist, 5, version)
         fileinfo = tp.add_all(fileinfo_head + attachlist)
         tp.send_data(link1, fileinfo)
+        tp.receive_data(link1)
 
+        picdata = open(filepath, 'rb')
         streamhead = bytearray(b'\x30\x31\x63\x64')
         fhead = struct.pack('128sl',filename1,filesize)
-        data = streamhead + fhead
+        picbytes = picdata.read(17642)
+        data = streamhead + fhead +picbytes
         link1.send(data)
-        picdata = open(filepath, 'rb')
-        while 1:
-            picbytes = picdata.read(1024)
-            link1.send(picbytes)
+        # picdata = open(filepath, 'rb')
+        # while 1:
+        #
+        #     link1.send(picbytes)
 
 
         tp.close(link1)
