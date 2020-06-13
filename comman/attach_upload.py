@@ -16,18 +16,19 @@ def attach_upload(tp,res,mobile,version):
     if version == 1:
         while len(mobile) < 20:
             mobile = '0' + mobile
-        # iplenth = (int(res[36:38],16))*2 #获取9208指令中服务器地址长度字段
+        iplenth = (int(res[36:38],16))*2 #获取9208指令中服务器地址长度字段
         ip2 = "112.126.64.32"
+        # ip2 = "192.168.24.142"
         port2 = 7901
-        alarmflag = res[68:108]  # 获取报警标识号
-        alarm_number = res[108:174]
+        alarmflag = res[42+iplenth:84+iplenth]  # 获取报警标识号
+        alarm_number = res[84+iplenth:148+iplenth]
         # 文件名（00_e1_e100_0_b87441129fb34ef8969fd0de2739d15e.jpg）转成16进制格式
         #文件名称可修改，文件大小不要大于64kb
         filepath = 'C:\\Users\\zwkj\\Desktop\\00_E1_E100_0_b87441129fb34ef8969fd0de2739d15e.jpg'
         #filename1为原始文件名，filename转为16进制后的名称
         filename1 = os.path.basename(filepath)
         filename = tp.character_string(filename1)
-        filename2 = tp.character_string(filename1,50)
+        filename2 = tp.character_string1(filename1,100)
         #filesize文件大小，filesize1文件大小转为16进制
         filesize = os.stat(filepath).st_size
         print filesize
@@ -51,16 +52,54 @@ def attach_upload(tp,res,mobile,version):
         tp.send_data(link1, fileinfo)
         tp.receive_data(link1)
 
+
+        i = 0
+        m = filesize // 65536
+        n = filesize % 65536
         picdata = open(filepath, 'rb')
-        streamhead = bytearray(b'\x30\x31\x63\x64')
-        fhead = struct.pack('128sl',filename1,filesize)
-        picbytes = picdata.read(17642)
-        data = streamhead + fhead +picbytes
-        link1.send(data)
-        # picdata = open(filepath, 'rb')
-        # while 1:
-        #
-        #     link1.send(picbytes)
+        # streamhead = bytearray(b'\x30\x31\x63\x64')
+        streamhead = '30316364'
+        if m == 0:
+            picbytes = picdata.read(filesize)
+            data1 = streamhead + filename2 + '00000000' + filesize1
+            data2 = tp.to_pack(data1)
+            data = data2 + picbytes
+            print data
+            link1.send(data)
+        else:
+            for i in range(m+1):
+                dataoffset1 = i * 65536
+                dataoffset2 = tp.to_hex(dataoffset1, 8)
+                if m - i == 0:
+                    picdata.seek(dataoffset1,1)
+                    picbytes = picdata.read(n)
+                    data1 = streamhead + filename2 + dataoffset2 + filesize1
+                    data2 = tp.to_pack(data1)
+                    data = data2 + picbytes
+                    link1.send(data)
+                else:
+                    picdata.seek(dataoffset1,1)
+                    picbytes = picdata.read(65536)
+                    data1 = streamhead + filename2 + dataoffset2 + filesize1
+                    data2 = tp.to_pack(data1)
+                    data = data2 + picbytes
+                    link1.send(data)
+
+        time.sleep(5)
+
+        #文件上传完整指令1212
+        usual_body = filenamelen + filename + '00' + filesize1
+        head = tp.data_head(mobile, 4626, usual_body, 5, version)
+        flishdata = tp .add_all(head + usual_body)
+        tp.send_data(link1,flishdata)
+        tp.receive_data(link1)
+
+        #文件上传完成指令应答9212
+        # usual_body = filenamelen + filename +'00' +'00' + '00' + '00000000' +'00000000'
+        # head = tp.data_head(mobile, 37394, usual_body, 5, version)
+        # rdata = tp.add_all(head + usual_body)
+        # tp.send_data(link1,rdata)
+        # tp.receive_data(link1)
 
 
         tp.close(link1)
