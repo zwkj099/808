@@ -15,18 +15,18 @@
 	    messageid: #区分单条位置512和批量位置1796
 	    version: #协议版本标识 version=0时表示2013版808协议，version=1时表示2019版808协议 -->
     
-		<Key>alarm=0</Key>
+		<Key>alarm=1</Key>
 		<Key>status=3</Key> <!-- 上传基站数据时，需要是未定位-->
 		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
 		<Key>high=100</Key>
 		<Key>speed=30</Key>
 		<Key>direction=100</Key>
-		<Key>period=30</Key>
+		<Key>period=10</Key>
 		<Key>ti=0</Key>
 		<Key>detester=2020-01-20 09:00:00</Key>
 		<Key>messageid=512</Key>
-		<Key>version=1</Key>
+		<Key>version=0</Key>
 		<!--<Key>下面加入redis访问的值</Key>-->
 		<Key>redishost=192.168.24.142</Key>
 		<Key>db=7</Key>

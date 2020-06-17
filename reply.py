@@ -338,6 +338,16 @@ def get_loadres_body(tp,data,answer_number,version):
             dat="1E2D1E"
             da = id + tp.to_hex(len(dat) / 2, 2) + dat
 
+        elif id =="FF00": #北京标准0104应答
+            dat="AAAAAABBBBBB"
+            da =id + tp.to_hex(len(dat)/2,2)+dat
+        elif id =="FF01":
+            dat="12345671234567"
+            da =id + tp.to_hex(len(dat)/2,2)+dat
+        elif id =="FF02":
+            dat="AAAAAA00000000000000AAAAAA00000000000000"
+            da =id + tp.to_hex(len(dat)/2,2)+dat
+
         elif id == "0000F641":#油量标定数组
             da=id+"75000000CA0000005B00000194000000B70000025E00000112000003280000016D000003F2000001C9000004BC00000224000005860000027F00000650000002DA0000071A00000336000007E400000391000008AE000003EC000009780000044800000A42000004A300000B0C000004FE00000BD60000055A00000CA0000005B500000D6A0000061000000E340000066C00000EFE000006C700000FC800000722FFFFFFFFFFFFFFFF247E"
         # 高精度硬件参数读取0X4F（电量检测）和0x50（终端信息检测），按0X4F0和x50设置的协议格式上传
