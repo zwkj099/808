@@ -216,8 +216,8 @@ vnum = u"渝JTS555"
 cont = 0
 name = "驾驶员桂A0002"
 qualification = 14303529463400355011
-attach = '02'  #00图片、02视频
-filepath = 'C:\\Users\\zwkj\\Desktop\\00_E1_E100_0_b87441129fb34ef8969fd0de2739d1322.mp4'
+attach = '00'  #00图片、02视频
+filepath = './resourceFile/00_E1_E100_0_b87441129fb34ef8969fd0de2739d1330.jpg'
 
 tal=0 #用于补传数据，多个监控对象时，每隔一个小时上传一个监控对象的补传数据
 thread_list = []
