@@ -69,6 +69,20 @@ class jctool(object):
         while len(g2) < length:
             g2 = g2+"30"
         return str(g2)
+
+    def character_string1(self, param,length=0):
+        '''
+        处理字符串字段,gbk编码后转ascii码
+        :param param: 编码前的汉字
+        :param length: 编码后的长度范围，无要求传入0
+        :return:编码后的字符串
+        '''
+        g = str(param)
+        g1 = g.decode('utf-8').encode('gbk')
+        g2 = binascii.b2a_hex(g1)
+        while len(g2) < length:
+            g2 = "30"+ g2
+        return str(g2)
     # 关闭tcp连接
     def close(self, tcplink):
         tcplink.close()
