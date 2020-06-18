@@ -18,12 +18,11 @@
 		<Key>alarm=0</Key>
 		<Key>status=3</Key> <!-- 上传基站数据时，需要是未定位-->
 		<Key>jin=104.505043</Key>
-		<Key>jin=104.505043</Key>
 		<Key>wei=28.173847</Key>
 		<Key>high=100</Key>
 		<Key>speed=30</Key>
 		<Key>direction=100</Key>
-		<Key>period=60</Key>
+		<Key>period=30</Key>
 		<Key>ti=0</Key>
 		<Key>detester=2020-01-20 09:00:00</Key>
 		<Key>messageid=512</Key>
@@ -83,7 +82,7 @@
 			wn:附加信息－GNSS 定位卫星数
 			temper：附加信息－车箱温度
 		-->
-		<Key>vedio_alarm=0</Key>
+		<Key>vedio_alarm=127</Key>	
 		<Key>vedio_signal=3</Key>
 		<Key>memery=2</Key>
 		<Key>abnormal_driving=4</Key>	

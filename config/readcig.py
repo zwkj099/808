@@ -89,7 +89,8 @@ class read_configfile(object):
     def build_data(self,pdict,sichuandict,ex808dict,sensordict,bluetoothdict,deviceid,port=6975):
         # 各省份标准主动安全参数
         zds=[sichuandict['sign'],sichuandict['event'],sichuandict['level'],sichuandict['deviate'],sichuandict['road_sign'],sichuandict['fatigue'],\
-             pdict['jin'], pdict['wei'],pdict['high'],pdict['speed'],sichuandict['zstatus'],deviceid,sichuandict['attach_Count'],port,sichuandict['tire_num'],sichuandict['tire_loc'],sichuandict['tire_alarm_type']]
+             pdict['jin'], pdict['wei'],pdict['high'],pdict['speed'],sichuandict['zstatus'],deviceid,sichuandict['attach_Count'],port,sichuandict['tire_num'],\
+             sichuandict['tire_loc'],sichuandict['tire_alarm_type']]
     
         # 808附加信息相关参数
         extrainfos=[ex808dict['vedio_alarm'], ex808dict['vedio_signal'], ex808dict['memery'], ex808dict['abnormal_driving'],\
