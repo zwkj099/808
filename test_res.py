@@ -27,7 +27,7 @@ readcig = readconfig()
 """
 
 
-def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
+def test1(ip, port, mobile, deviceid, vnum, name, qualification,attach,filepath,i=0,tal=0):
 
     ip = str(ip)
     port = str(port)
@@ -185,7 +185,7 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,i=0,tal=0):
                         except Exception as e:
                             print e
                     elif id == '9208':
-                        th = threading.Thread(target=attach_upload.attach_upload, args=(tp, res, mobile, pdict['version']))
+                        th = threading.Thread(target=attach_upload.attach_upload, args=(tp, res, mobile, attach,filepath,pdict['version']))
                         th.start()
 
 
@@ -207,17 +207,22 @@ def ano_res(res):
 # ip = "192.168.24.142"  # 218.78.40.57,"111.41.48.133"#"192.168.24.142"
 ip = "112.126.64.32"
 port =7003  # 6994川标,6995冀标，6975部标,6996桂标，6997苏标，6998浙标，6999吉标，7000陕标,7002沪标；7003中位标准
-deviceid =0002555 #20190928
-mobile =13200222555 #123456789
-vnum = u"渝JTS555"  #桂BB001
+# deviceid =9900021 #20190928
+deviceid =0002555
+# mobile =17799990021 #123456789
+mobile =13200222555
+# vnum = u"中W00021"  #桂BB001
+vnum = u"渝JTS555"
 cont = 0
 name = "驾驶员桂A0002"
 qualification = 14303529463400355011
+attach = '02'  #00图片、02视频
+filepath = 'C:\\Users\\zwkj\\Desktop\\00_E1_E100_0_b87441129fb34ef8969fd0de2739d1322.mp4'
 
 tal=0 #用于补传数据，多个监控对象时，每隔一个小时上传一个监控对象的补传数据
 thread_list = []
 for i in range(0, 1):
-    t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,i,tal))
+    t = threading.Thread(target=test1, args=(ip, port, mobile, deviceid, vnum, name, qualification,attach,filepath,i,tal))
     t.start()
     name = "驾驶员"
     deviceid += 1
