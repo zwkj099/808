@@ -185,8 +185,6 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,attach,filepath,
                     elif id == '9208':
                         th = threading.Thread(target=attach_upload.attach_upload, args=(tp, res, mobile, attach,filepath,pdict['version']))
                         th.start()
-
-
                     else:
                         reply.reply(tp,link, res, mobile, id, answer_number, reno,pdict['version'])
 
