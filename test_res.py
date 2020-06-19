@@ -35,7 +35,6 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,attach,filepath,
     deviceid = str(deviceid)
     #读取传感器参数
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
-
     """
     需要上传的附加信息或基于0200的扩展信息；十进制数，0或不填写表示不上传对应附加信息
     1.extrainfo_id：为808附加信息及音视频报警扩展信息
