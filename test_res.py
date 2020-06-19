@@ -33,7 +33,6 @@ def test1(ip, port, mobile, deviceid, vnum, name, qualification,attach,filepath,
     port = str(port)
     mobile = str(mobile)
     deviceid = str(deviceid)
-
     #读取传感器参数
     pdict, sichuandict, ex808dict, sensordict, bluetoothdict = readcig.readtestfile()
 
