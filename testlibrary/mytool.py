@@ -155,14 +155,14 @@ class mytool(object):
 
 
         for id in ids:
-            if id in (100,101,102,103,112,113):
+            if id in (100,101,102,103,112,113):#川冀标主动安全数据
                 # body = self.add_zdaq(id, sign, event, level, deviate, road_sign, fatigue, jin, wei, high, speed, zstatus,deviceid,attach_Count,port,tire_num,tire_loc,tire_alarm_type)
                 body = self.add_zdaq(id, pdict,sichuandict,deviceid,port)
                 ZDAQ_body += body
-            elif id in (225,226,227,228,229,231):
+            elif id in (225,226,227,228,229,231):#中位主动安全数据
                 body = self.add_ZW_zdaq(id)#zdaq(id, pdict, sichuandict, deviceid, port)
                 ZDAQ_body += body
-            elif id in (81,82): #zdaq(id, pdict, jbzd, deviceid, port)
+            elif id in (81,82): #北京主动安全数据
                 body = self.add_JB_zdaq(id)
                 ZDAQ_body += body
             else:
