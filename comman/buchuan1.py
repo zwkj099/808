@@ -4,6 +4,7 @@ Created on 2019��8��19��
 
 @author: admin
 '''
+from comman import upload_location
 import datetime
 import time
 from comman.autoupload import readexcel
@@ -14,7 +15,6 @@ def upload(tp,link,mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdi
     date =date + datetime.timedelta(seconds=int(tal))
     second = 30
     timelist = []
-
     num = int(excellist[5])+1
     alarm_num = int(excellist[2])
     #主动安全数据
@@ -59,20 +59,14 @@ def upload(tp,link,mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdi
         #如果循环次数大于报警次数，报警归0，不上传报警
         if (j+1)>alarm_num:
             wsid=[0]
-        print "报警："
-        print wsid
         gpsdata = tp.position(mobile, pdict['messageid'], 6, 1, pdict['alarm'], pdict['status'], pdict['jin'],
                               pdict['wei'], \
-                              pdict['high'], pdict['speed'], pdict['ti'], pdict['direction'], \
+                              pdict['high'], pdict['speed'], timelist[j], pdict['direction'], \
                               tp.extra_info(extrainfo_id, ex808dict),
                               tp.zd_body(wsid, pdict, sichuandict, deviceid, port),
-                              tp.f3_attach(idlist, pdict, sensordict, bluetoothdict), pdict['version'], answer_number)
+                              tp.f3_attach(idlist, pdict, sensordict, bluetoothdict), pdict['version'], answer_number) #组装位置消息体，用timelist[j]替换pdict['ti']
+        upload_location.subpackage(tp, link, mobile, gpsdata, pdict['version'], pdict['messageid'])#断定是否分包发送，并组装消息头消息体再发送数据
 
-        gpshead = tp.data_head(mobile, pdict['messageid'], gpsdata, 3, pdict['version'])
-        gpsdata = tp.add_all(gpshead + gpsdata)
-
-        print "补传数据"
-        tp.send_data(link, gpsdata)
         #如果循环次数小于等于里程需要增加的次数，里程每次加1，否则里程保持不变
         if (j+1) <num:
             print "里程："
@@ -82,7 +76,7 @@ def upload(tp,link,mobile, pdict, sichuandict, ex808dict, sensordict,bluetoothdi
 
 def deal_data(pdict, sichuandict, ex808dict, sensordict,bluetoothdict,wsid1,i):
     for k in range(i, i + 1):
-        excel_list = readexcel()
+        excel_list = readexcel()#封装读取excel数据
         if str(excel_list[k][0]).find('|') != -1:
             # wsid1 = list(map(lambda x: int(x), list(str(excel_list[k][0]).split('|'))))
             wslist = str(excel_list[k][0]).split('|')
