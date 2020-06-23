@@ -109,7 +109,6 @@ def attach_upload(ip,tp,res,mobile,attach,filepath,version,deviceid):
 
         head = tp.data_head(mobile, 4624, usual_body, 5, version)
         redata = tp.add_all(head + usual_body)
-
         link1 = tp.tcp_link(ip, port2)
         tp.send_data(link1,redata)
         tp.receive_data(link1)
